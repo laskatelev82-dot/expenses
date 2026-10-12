@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#4CAF50">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Расходы">
+  <meta name="application-name" content="Расходы">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="512x512" href="https://lh3.googleusercontent.com/d/1Z1JBIhqKI1PDsYgKbgmp372XNmg5NNkG">
+  <link rel="icon" type="image/png" sizes="192x192" href="https://lh3.googleusercontent.com/d/1Z1JBIhqKI1PDsYgKbgmp372XNmg5NNkG">
+  <link rel="shortcut icon" href="https://lh3.googleusercontent.com/d/1Z1JBIhqKI1PDsYgKbgmp372XNmg5NNkG">
+  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1Z1JBIhqKI1PDsYgKbgmp372XNmg5NNkG">
+  <title>Расходы</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    html, body {
+      overscroll-behavior: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 16px;
+      padding-top: calc(16px + env(safe-area-inset-top));
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+      background: #f0f2f5;
+      min-height: 100vh;
+      color: #1c1c1e;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    h1 { font-size: 24px; margin: 0 0 4px; font-weight: 700; }
+    .subtitle { color: #8e8e93; font-size: 14px; margin-bottom: 20px; }
+
+    input[type=text] {
+      width: 100%; padding: 16px; font-size: 17px;
+      border: 2px solid #e5e5ea; border-radius: 12px;
+      margin-bottom: 12px; background: #f9f9fb;
+      transition: all 0.2s; font-family: inherit;
+      -webkit-user-select: text; user-select: text;
+    }
+    input[type=text]:focus { outline: none; border-color: #4CAF50; background: white; }
+
+    .btn {
+      width: 100%; padding: 16px; font-size: 17px; font-weight: 600;
+      background: #4CAF50; color: white;
+      border: none; border-radius: 12px; cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .btn:active { background: #45a049; transform: scale(0.98); }
+    .btn:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-secondary { background: #f0f2f5; color: #1c1c1e; margin-top: 8px; }
+    .btn-secondary:active { background: #e5e5ea; }
+
+    .result {
+      margin-top: 12px; padding: 14px; border-radius: 12px;
+      font-size: 15px; display: none;
+      animation: slideIn 0.3s ease;
+    }
+    .ok { background: #d4edda; color: #155724; display: block; }
+    .err { background: #f8d7da; color: #721c24; display: block; }
+    .info { background: #d1ecf1; color: #0c5460; display: block; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .quick-buttons {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-top: 8px;
+    }
+    .quick-btn {
+      padding: 12px 8px; font-size: 14px; font-weight: 500;
+      background: #f0f2f5; color: #1c1c1e;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .quick-btn:active { background: #e0e0e5; }
+
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .stat-box { background: #f9f9fb; border-radius: 12px; padding: 16px; text-align: center; }
+    .stat-value { font-size: 22px; font-weight: 700; color: #1c1c1e; margin-bottom: 4px; }
+    .stat-label { font-size: 13px; color: #8e8e93; }
+    .stat-value.green { color: #4CAF50; }
+
+    .recent-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid #f0f0f0;
+      font-size: 14px; gap: 8px;
+    }
+    .recent-item:last-child { border-bottom: none; }
+    .recent-text { color: #1c1c1e; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .recent-cat { font-size: 12px; color: #8e8e93; white-space: nowrap; }
+    .recent-amount { font-weight: 600; color: #1c1c1e; white-space: nowrap; }
+
+    .help-toggle {
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; padding: 4px 0;
+      color: #4CAF50; font-weight: 600; font-size: 15px;
+    }
+    .help-content {
+      display: none; padding-top: 12px;
+      font-size: 14px; color: #3a3a3c; line-height: 1.7;
+    }
+    .help-content.show { display: block; }
+    .help-content code { background: #f0f2f5; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+
+    .section-title {
+      font-size: 15px; font-weight: 600; color: #8e8e93;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .category-prompt {
+      background: #fff3cd; padding: 16px; border-radius: 12px;
+      margin-top: 12px; display: none;
+    }
+    .category-prompt.show { display: block; }
+    .category-prompt p { margin: 0 0 12px; font-size: 15px; color: #856404; }
+
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle; margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>💸 Расходы</h1>
+    <div class="subtitle">Записывай траты в свободной форме</div>
+
+    <input type="text" id="text" placeholder="кофе 300" autocomplete="off" autofocus>
+    <button class="btn" id="btn" onclick="submitExpense()">Записать</button>
+
+    <div class="result" id="result"></div>
+
+    <div class="stats" style="margin-top: 16px;">
+      <div class="stat-box">
+        <div class="stat-value green" id="todayTotal">—</div>
+        <div class="stat-label">Сегодня</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="monthTotal">—</div>
+        <div class="stat-label">За месяц</div>
+      </div>
+    </div>
+
+    <div class="category-prompt" id="catPrompt">
+      <p>🤔 Не знаю категорию для «<b id="catKeyword"></b>».</p>
+      <input type="text" id="catInput" placeholder="Спорт, Хобби, Дети..." autocomplete="off">
+      <button class="btn" onclick="submitCategory()">Сохранить категорию</button>
+      <button class="btn btn-secondary" onclick="cancelCategory()">Отменить</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">⚡ Быстрые траты</div>
+    <div class="quick-buttons">
+      <button class="quick-btn" onclick="quickAdd('кофе 200')">☕ Кофе 200</button>
+      <button class="quick-btn" onclick="quickAdd('обед 500')">🍽 Обед 500</button>
+      <button class="quick-btn" onclick="quickAdd('такси 300')">🚕 Такси 300</button>
+      <button class="quick-btn" onclick="quickAdd('продукты 1000')">🛒 Продукты 1000</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">🕐 Последние записи</div>
+    <div id="recentList">
+      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="help-toggle" onclick="toggleHelp()">
+      <span>❓ Как пользоваться</span>
+      <span id="helpArrow">▼</span>
+    </div>
+    <div class="help-content" id="helpContent">
+      <p><b>Как записать расход:</b></p>
+      <p>Просто напиши в поле: <code>кофе 300</code>, <code>такси 500</code>, <code>продукты 1500</code>.</p>
+      <p><b>Категории:</b> бот сам определит категорию по ключевому слову. Если не знает — попросит ввести и запомнит.</p>
+      <p><b>Быстрые кнопки:</b> можно тапнуть на частые траты — они подставятся в поле.</p>
+    </div>
+  </div>
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwZaU3xfaQqKa1IV6ilnULNIerYocRtEZT7Gb9duB5pgMCFm_OJpBrH8IKL699_byf/exec';
+  let pendingCategory = null;
+
+  function jsonp(params) {
+    return new Promise((resolve) => {
+      const callbackName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      const script = document.createElement('script');
+      
+      window[callbackName] = function(data) {
+        resolve(data);
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+      };
+      
+      const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString() + '&callback=' + callbackName;
+      script.src = url;
+      script.onerror = function() {
+        resolve({ ok: false, error: 'Ошибка соединения' });
+        if (script.parentNode) script.parentNode.removeChild(script);
+      };
+      document.body.appendChild(script);
+      
+      setTimeout(function() {
+        if (window[callbackName]) {
+          resolve({ ok: false, error: 'Превышено время ожидания' });
+          delete window[callbackName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+      }, 10000);
+    });
+  }
+
+  async function submitExpense() {
+    const input = document.getElementById('text');
+    const text = input.value.trim();
+    if (!text) return;
+
+    showLoading(true);
+    hideResult();
+
+    const result = await jsonp({ action: 'add', text: text, who: 'App' });
+    showLoading(false);
+
+    if (result && result.ok) {
+      showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category);
+      input.value = '';
+      input.focus();
+      loadStats();
+      loadRecent();
+    } else if (result && result.needCategory) {
+      pendingCategory = { text: text, amount: result.amount, keyword: result.keyword };
+      document.getElementById('catKeyword').textContent = result.keyword;
+      document.getElementById('catPrompt').classList.add('show');
+      document.getElementById('catInput').value = '';
+      document.getElementById('catInput').focus();
+    } else {
+      showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка'));
+    }
+  }
+
+  async function submitCategory() {
+    if (!pendingCategory) return;
+    const cat = document.getElementById('catInput').value.trim();
+    if (!cat) return;
+
+    showLoading(true);
+    
+    const result = await jsonp({
+      action: 'addCategory',
+      keyword: pendingCategory.keyword,
+      category: cat,
+      amount: pendingCategory.amount,
+      text: pendingCategory.text,
+      who: 'App'
+    });
+    
+    showLoading(false);
+
+    if (result && result.ok) {
+      showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category + ' (запомнил!)');
+      document.getElementById('text').value = '';
+      cancelCategory();
+      loadStats();
+      loadRecent();
+    } else {
+      showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка'));
+    }
+  }
+
+  function cancelCategory() {
+    pendingCategory = null;
+    document.getElementById('catPrompt').classList.remove('show');
+  }
+
+  function quickAdd(text) {
+    document.getElementById('text').value = text;
+    submitExpense();
+  }
+
+  async function loadStats() {
+    const data = await jsonp({ action: 'stats' });
+    if (data && data.ok) {
+      document.getElementById('todayTotal').textContent = data.today.toFixed(0) + ' ₽';
+      document.getElementById('monthTotal').textContent = data.month.toFixed(0) + ' ₽';
+    }
+  }
+
+  async function loadRecent() {
+    const data = await jsonp({ action: 'recent' });
+    const list = document.getElementById('recentList');
+    if (!data || !data.ok || !data.items || data.items.length === 0) {
+      list.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Пока нет записей</div>';
+      return;
+    }
+    list.innerHTML = data.items.map(function(item) {
+      return '<div class="recent-item">' +
+        '<div class="recent-text">' + escapeHtml(item.text) + '</div>' +
+        '<div class="recent-cat">' + escapeHtml(item.category) + '</div>' +
+        '<div class="recent-amount">' + item.amount.toFixed(0) + ' ₽</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function showResult(type, text) {
+    const r = document.getElementById('result');
+    r.className = 'result ' + type;
+    r.textContent = text;
+  }
+
+  function hideResult() {
+    document.getElementById('result').className = 'result';
+  }
+
+  function showLoading(show) {
+    const btn = document.getElementById('btn');
+    if (show) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Записываю...';
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Записать';
+    }
+  }
+
+  function toggleHelp() {
+    const c = document.getElementById('helpContent');
+    const a = document.getElementById('helpArrow');
+    c.classList.toggle('show');
+    a.textContent = c.classList.contains('show') ? '▲' : '▼';
+  }
+
+  document.getElementById('text').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') submitExpense();
+  });
+  document.getElementById('catInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') submitCategory();
+  });
+
+  loadStats();
+  loadRecent();
+</script>
+</body>
+</html>
