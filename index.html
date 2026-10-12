@@ -67,6 +67,8 @@
     .btn:disabled { background: #ccc; cursor: not-allowed; }
     .btn-secondary { background: #f0f2f5; color: #1c1c1e; margin-top: 8px; }
     .btn-secondary:active { background: #e5e5ea; }
+    .btn-danger { background: #ff3b30; color: white; }
+    .btn-danger:active { background: #d70015; }
 
     .result {
       margin-top: 12px; padding: 14px; border-radius: 12px;
@@ -75,7 +77,6 @@
     }
     .ok { background: #d4edda; color: #155724; display: block; }
     .err { background: #f8d7da; color: #721c24; display: block; }
-    .info { background: #d1ecf1; color: #0c5460; display: block; }
 
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(-8px); }
@@ -109,6 +110,13 @@
     .recent-text { color: #1c1c1e; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .recent-cat { font-size: 12px; color: #8e8e93; white-space: nowrap; }
     .recent-amount { font-weight: 600; color: #1c1c1e; white-space: nowrap; }
+    .delete-btn {
+      background: transparent; border: none; cursor: pointer;
+      font-size: 18px; padding: 4px 8px; margin-left: 4px;
+      opacity: 0.6; transition: opacity 0.2s;
+      font-family: inherit; color: #ff3b30;
+    }
+    .delete-btn:active { opacity: 1; }
 
     .help-toggle {
       display: flex; justify-content: space-between; align-items: center;
@@ -126,6 +134,7 @@
       font-size: 15px; font-weight: 600; color: #8e8e93;
       text-transform: uppercase; letter-spacing: 0.5px;
       margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center;
     }
 
     .category-prompt {
@@ -186,7 +195,10 @@
   </div>
 
   <div class="card">
-    <div class="section-title">🕐 Последние записи</div>
+    <div class="section-title">
+      <span>🕐 Последние записи</span>
+      <button class="delete-btn" style="font-size:13px;" onclick="clearAll()">Очистить всё</button>
+    </div>
     <div id="recentList">
       <div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div>
     </div>
@@ -202,6 +214,7 @@
       <p>Просто напиши в поле: <code>кофе 300</code>, <code>такси 500</code>, <code>продукты 1500</code>.</p>
       <p><b>Категории:</b> бот сам определит категорию по ключевому слову. Если не знает — попросит ввести и запомнит.</p>
       <p><b>Быстрые кнопки:</b> можно тапнуть на частые траты — они подставятся в поле.</p>
+      <p><b>Удаление:</b> рядом с каждой записью есть кнопка ✕ для удаления. Кнопка «Очистить всё» удаляет всю историю.</p>
     </div>
   </div>
 
@@ -295,6 +308,32 @@
     }
   }
 
+  async function deleteRow(rowIndex) {
+    if (!confirm('Удалить эту запись?')) return;
+    
+    const result = await jsonp({ action: 'delete', row: rowIndex });
+    if (result && result.ok) {
+      loadStats();
+      loadRecent();
+    } else {
+      alert('Ошибка удаления: ' + (result && result.error ? result.error : 'неизвестно'));
+    }
+  }
+
+  async function clearAll() {
+    if (!confirm('Удалить ВСЕ записи из таблицы?\n\nЭто действие нельзя отменить!')) return;
+    if (!confirm('Точно удалить всё? Категории останутся, а расходы исчезнут.')) return;
+    
+    const result = await jsonp({ action: 'clearAll' });
+    if (result && result.ok) {
+      alert('Удалено записей: ' + result.deleted);
+      loadStats();
+      loadRecent();
+    } else {
+      alert('Ошибка: ' + (result && result.error ? result.error : 'неизвестно'));
+    }
+  }
+
   function cancelCategory() {
     pendingCategory = null;
     document.getElementById('catPrompt').classList.remove('show');
@@ -325,6 +364,7 @@
         '<div class="recent-text">' + escapeHtml(item.text) + '</div>' +
         '<div class="recent-cat">' + escapeHtml(item.category) + '</div>' +
         '<div class="recent-amount">' + item.amount.toFixed(0) + ' ₽</div>' +
+        '<button class="delete-btn" onclick="deleteRow(' + item.row + ')">✕</button>' +
         '</div>';
     }).join('');
   }
