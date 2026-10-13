@@ -278,18 +278,21 @@
   let openGroups = {};
 
   const CATEGORY_STYLES = {
-    'еда':         { emoji: '🍔', cls: 'acc-food' },
-    'продукты':    { emoji: '🍔', cls: 'acc-food' },
-    'транспорт':   { emoji: '🚕', cls: 'acc-transport' },
-    'жильё':       { emoji: '🏠', cls: 'acc-home' },
-    'связь':       { emoji: '📱', cls: 'acc-comm' },
-    'здоровье':    { emoji: '🏥', cls: 'acc-health' },
-    'покупки':     { emoji: '🛍', cls: 'acc-shop' },
-    'развлечения': { emoji: '🎉', cls: 'acc-fun' },
-    'маркетплейсы':{ emoji: '📦', cls: 'acc-shop' },
-    'банк':        { emoji: '🏦', cls: 'acc-default' },
-    'другое':      { emoji: '📦', cls: 'acc-default' }
-  };
+  'еда':         { emoji: '🍔', cls: 'acc-food' },
+  'продукты':    { emoji: '🍔', cls: 'acc-food' },
+  'транспорт':   { emoji: '🚕', cls: 'acc-transport' },
+  'жильё':       { emoji: '🏠', cls: 'acc-home' },
+  'связь':       { emoji: '📱', cls: 'acc-comm' },
+  'здоровье':    { emoji: '🏥', cls: 'acc-health' },
+  'покупки':     { emoji: '🛍', cls: 'acc-shop' },
+  'развлечения': { emoji: '🎉', cls: 'acc-fun' },
+  'маркетплейсы':{ emoji: '📦', cls: 'acc-shop' },
+  'дети':        { emoji: '👶', cls: 'acc-fun' },
+  'кредит':      { emoji: '💳', cls: 'acc-default' },
+  'собака':      { emoji: '🐶', cls: 'acc-shop' },
+  'банк':        { emoji: '🏦', cls: 'acc-default' },
+  'другое':      { emoji: '📦', cls: 'acc-default' }
+};
 
   function getCategoryStyle(cat) {
     const key = String(cat).toLowerCase().trim();
