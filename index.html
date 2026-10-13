@@ -190,7 +190,7 @@
   <div class="card">
     <h1>💸 Расходы</h1>
     <div class="subtitle">Пиши траты или спрашивай ИИ</div>
-    <input type="text" id="text" placeholder="кофе 300 или «на что уходит больше?»" autocomplete="off" autofocus>
+    <input type="text" id="text" placeholder="кофе 300 или «Плюша, что приготовить?»" autocomplete="off" autofocus>
     <button class="btn" id="btn" onclick="submitExpense()">Отправить</button>
     <div class="result" id="result"></div>
     <div class="stats" style="margin-top: 16px;">
@@ -253,13 +253,16 @@
       <span>❓ Как пользоваться</span>
       <span id="helpArrow">▼</span>
     </div>
-    <div class="help-content" id="helpContent">
-      <p><b>Запись расхода:</b> <code>кофе 300</code>, <code>такси 500</code>.</p>
-      <p><b>ИИ-запросы:</b> <code>на что уходит больше?</code>, <code>сравни месяцы</code>.</p>
-      <p><b>Категории:</b> тап на категорию — раскрывается список.</p>
-      <p><b>Записи:</b> тап на запись — все траты с этим словом.</p>
-    </div>
-  </div>
+    <<div class="help-content" id="helpContent">
+  <p><b>📝 Запись расхода:</b> <code>кофе 300</code>, <code>такси 500</code> — мгновенно, без ИИ.</p>
+  <p><b>🤖 ИИ-помощник Плюша:</b> пиши запрос с её именем в начале:</p>
+  <p>• <code>Плюша, на что уходит больше за месяц?</code></p>
+  <p>• <code>Плюша, что приготовить из курицы?</code></p>
+  <p>• <code>Плюша, как сэкономить?</code></p>
+  <p>• <code>Плюша, сколько потратил на такси за неделю?</code></p>
+  <p><b>🏷 Категории:</b> тап на категорию — раскрывается список.</p>
+  <p><b>🕐 Записи:</b> тап на запись — все траты с этим словом.</p>
+</div>
 
   <div class="modal" id="searchModal" onclick="if(event.target===this)closeSearchModal()">
     <div class="modal-content">
@@ -344,6 +347,31 @@
   return null;
 }
 
+  async   // Проверка: обращается ли пользователь к ИИ по имени
+    // Проверка: обращается ли пользователь к ИИ по имени
+  function isAICall(text) {
+    const lower = text.toLowerCase().trim();
+    const names = ['плюша', 'плюш', 'плюшка'];
+    for (const name of names) {
+      if (lower.startsWith(name) || lower.startsWith(name + ',') || lower.startsWith(name + ' ')) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  // Убираем имя из начала запроса
+  function stripAIName(text) {
+    const lower = text.toLowerCase().trim();
+    const names = ['плюша', 'плюш', 'плюшка'];
+    for (const name of names) {
+      if (lower.startsWith(name)) {
+        return text.substring(name.length).replace(/^[\s,.:;!?-]+/, '').trim();
+      }
+    }
+    return text;
+  }
+
   async function submitExpense() {
     const input = document.getElementById('text');
     const text = input.value.trim();
@@ -351,6 +379,29 @@
     showLoading(true);
     hideResult();
     
+    // === ИИ-запрос (только если позвали по имени) ===
+    if (isAICall(text)) {
+      const question = stripAIName(text);
+      if (!question) {
+        showLoading(false);
+        showResult('ok', '👋 Привет! Я Плюша. Спроси что-нибудь — например: «Плюша, на что уходит больше за месяц?»');
+        return;
+      }
+      const result = await jsonp({ action: 'ai', text: question });
+      showLoading(false);
+      if (result && result.ok && result.type === 'ai') {
+        showResult('ok', '🤖 ' + result.message);
+        input.value = '';
+        loadStats();
+        loadRecent();
+        loadCategories();
+      } else {
+        showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка ИИ'));
+      }
+      return;
+    }
+    
+    // === Простые запросы без ИИ ===
     const simpleType = isSimpleQuery(text);
     let result;
     
@@ -381,33 +432,101 @@
       return;
     } else if (simpleType === 'help') {
       showLoading(false);
-      showResult('ok', '💡 Примеры:\n• кофе 300 — запись\n• на что уходит больше? — анализ\n• сколько на такси за неделю? — поиск\n• что приготовить из курицы? — рецепт\n• как сэкономить? — совет');
+      showResult('ok', '💡 Как пользоваться:\n\n' +
+        '📝 Запись: «кофе 300» — мгновенно\n' +
+        '🤖 Плюша: начни с имени «Плюша, ...»\n' +
+        '   • «Плюша, на что уходит больше?»\n' +
+        '   • «Плюша, что приготовить из курицы?»\n' +
+        '   • «Плюша, как сэкономить?»\n' +
+        '📊 Статистика: «сколько потратил за сегодня»');
       return;
     } else {
-      result = await jsonp({ action: 'ai', text: text });
+      showLoading(false);
+      showResult('err', '🤔 Не понял. Для записи: «кофе 300». Для ИИ: «Плюша, ...»');
+      return;
     }
     
     showLoading(false);
     if (result && result.ok) {
-      if (result.type === 'ai') {
-        showResult('ok', '🤖 ' + result.message);
+      if (result.needCategory) {
+        pendingCategory = { text: text, amount: result.amount, keyword: result.keyword };
+        document.getElementById('catKeyword').textContent = result.keyword;
+        document.getElementById('catPrompt').classList.add('show');
+        document.getElementById('catInput').value = '';
+        document.getElementById('catInput').focus();
+      } else {
+        showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category);
         input.value = '';
+        input.focus();
         loadStats();
         loadRecent();
-        loadCategories();
-        return;
       }
-      showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category);
-      input.value = '';
-      input.focus();
-      loadStats();
-      loadRecent();
-    } else if (result && result.needCategory) {
-      pendingCategory = { text: text, amount: result.amount, keyword: result.keyword };
-      document.getElementById('catKeyword').textContent = result.keyword;
-      document.getElementById('catPrompt').classList.add('show');
-      document.getElementById('catInput').value = '';
-      document.getElementById('catInput').focus();
+    } else {
+      showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка'));
+    }
+  }
+    
+    // === Простые запросы без ИИ ===
+    const simpleType = isSimpleQuery(text);
+    let result;
+    
+    if (simpleType === 'add') {
+      result = await jsonp({ action: 'add', text: text, who: 'App' });
+    } else if (simpleType === 'stats') {
+      result = await jsonp({ action: 'stats' });
+      showLoading(false);
+      if (result && result.ok) {
+        showResult('ok', '💰 Сегодня: ' + result.today.toFixed(0) + ' ₽\n📅 За месяц: ' + result.month.toFixed(0) + ' ₽');
+      }
+      return;
+    } else if (simpleType === 'getCategories') {
+      result = await jsonp({ action: 'getCategories' });
+      showLoading(false);
+      if (result && result.ok) {
+        const byCat = {};
+        result.items.forEach(function(i) {
+          if (!byCat[i.category]) byCat[i.category] = [];
+          byCat[i.category].push(i.keyword);
+        });
+        let msg = '🏷 Категории:\n\n';
+        Object.keys(byCat).forEach(function(cat) {
+          msg += '• ' + cat + ': ' + byCat[cat].join(', ') + '\n';
+        });
+        showResult('ok', msg);
+      }
+      return;
+    } else if (simpleType === 'help') {
+      showLoading(false);
+      showResult('ok', '💡 Как пользоваться:\n\n' +
+        '📝 Запись: «кофе 300» — мгновенно\n' +
+        '🤖 ИИ: начни с имени «Ассистент, ...»\n' +
+        '   • «Ассистент, на что уходит больше?»\n' +
+        '   • «Ассистент, что приготовить из курицы?»\n' +
+        '   • «Ассистент, как сэкономить?»\n' +
+        '📊 Статистика: «сколько потратил за сегодня»');
+      return;
+    } else {
+      // Не понял — подсказка, без ИИ
+      showLoading(false);
+      showResult('err', '🤔 Не понял. Для записи: «кофе 300». Для ИИ: «Ассистент, ...»');
+      return;
+    }
+    
+    showLoading(false);
+    if (result && result.ok) {
+      if (result.needCategory) {
+        pendingCategory = { text: text, amount: result.amount, keyword: result.keyword };
+        document.getElementById('catKeyword').textContent = result.keyword;
+        document.getElementById('catPrompt').classList.add('show');
+        document.getElementById('catInput').value = '';
+        document.getElementById('catInput').focus();
+      } else {
+        showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category);
+        input.value = '';
+        input.focus();
+        loadStats();
+        loadRecent();
+      }
     } else {
       showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка'));
     }
