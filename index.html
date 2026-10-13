@@ -23,16 +23,6 @@
     }
     .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     h1 { font-size: 24px; margin: 0 0 4px; font-weight: 700; }
-    .acc-word-total {
-      font-size: 13px;
-      font-weight: 600;
-      color: #1c1c1e;
-      margin-right: 8px;
-      white-space: nowrap;
-    }
-    .acc-word-total-empty {
-      display: none;
-    }
     .subtitle { color: #8e8e93; font-size: 14px; margin-bottom: 20px; }
     input[type=text] {
       width: 100%; padding: 16px; font-size: 17px;
@@ -107,6 +97,7 @@
     .modal-close { background: transparent; border: none; font-size: 20px; cursor: pointer; color: #8e8e93; padding: 4px 8px; border-radius: 8px; font-family: inherit; }
     .modal-close:active { background: #f0f0f0; }
     .modal-body { padding: 8px 20px 20px; overflow-y: auto; flex: 1; }
+    
     .acc-group { border-radius: 12px; margin-bottom: 8px; overflow: hidden; transition: all 0.2s; }
     .acc-group:last-child { margin-bottom: 0; }
     .acc-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; user-select: none; }
@@ -120,8 +111,11 @@
     .acc-group.open .acc-arrow { transform: rotate(90deg); }
     .acc-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
     .acc-group.open .acc-body { max-height: 3000px; }
+    
     .acc-word { display: flex; align-items: center; gap: 8px; padding: 12px 16px 12px 46px; font-size: 14px; background: rgba(255,255,255,0.5); border-top: 1px solid rgba(0,0,0,0.04); }
     .acc-word-name { flex: 1; color: #1c1c1e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .acc-word-total { font-size: 13px; font-weight: 700; color: #1c1c1e; margin-right: 8px; white-space: nowrap; }
+    .acc-word-total-empty { opacity: 0.35; font-weight: 400; }
     .acc-word-actions { display: flex; gap: 4px; flex-shrink: 0; }
     .acc-word-btn { background: rgba(255,255,255,0.7); border: none; cursor: pointer; font-size: 14px; padding: 5px 9px; border-radius: 8px; opacity: 0.7; transition: all 0.15s; font-family: inherit; line-height: 1; }
     .acc-word-btn:active { opacity: 1; transform: scale(0.92); }
@@ -223,7 +217,7 @@
       <p>• <code>Плюша, на что уходит больше за месяц?</code></p>
       <p>• <code>Плюша, что приготовить из курицы?</code></p>
       <p>• <code>Плюша, как сэкономить?</code></p>
-      <p><b>🏷 Категории:</b> тап на категорию — раскрыть список слов. Суммы — за всё время.</p>
+      <p><b>🏷 Категории:</b> тап — раскрыть. Суммы за всё время — и в категориях, и в словах.</p>
     </div>
   </div>
 
@@ -441,6 +435,7 @@
     if (result && result.ok) {
       loadStats();
       loadRecent();
+      loadCategories();
     } else {
       alert('Ошибка удаления: ' + (result && result.error ? result.error : 'неизвестно'));
     }
@@ -454,6 +449,7 @@
       alert('Удалено записей: ' + result.deleted);
       loadStats();
       loadRecent();
+      loadCategories();
     } else {
       alert('Ошибка: ' + (result && result.error ? result.error : 'неизвестно'));
     }
@@ -547,7 +543,7 @@
     
     for (const g of data.groups) {
       for (const it of g.items) {
-        allCategories.push({ keyword: it.keyword, category: it.category, row: it.row });
+        allCategories.push({ keyword: it.keyword, category: it.category, row: it.row, total: it.total || 0 });
       }
       categoryTotals[g.category] = g.total || 0;
       grandTotal += g.total || 0;
@@ -599,19 +595,22 @@
               || g.category.toLowerCase().indexOf(searchQuery) !== -1;
         });
       }
+      
       const wordsHtml = visibleItems.map(function(item) {
-       const wordTotal = item.total > 0 ? item.total.toFixed(0) + ' ₽' : '';
-       const wordTotalClass = item.total > 0 ? 'acc-word-total' : 'acc-word-total acc-word-total-empty';
-       return '<div class="acc-word">' +
-         '<div class="acc-word-name">' + escapeHtml(item.keyword) + '</div>' +
-         '<div class="' + wordTotalClass + '">' + wordTotal + '</div>' +
+        const wordTotal = item.total > 0 ? item.total.toFixed(0) + ' ₽' : '';
+        const wordTotalClass = item.total > 0 ? 'acc-word-total' : 'acc-word-total acc-word-total-empty';
+        return '<div class="acc-word">' +
+          '<div class="acc-word-name">' + escapeHtml(item.keyword) + '</div>' +
+          '<div class="' + wordTotalClass + '">' + wordTotal + '</div>' +
           '<div class="acc-word-actions">' +
-        '<button class="acc-word-btn edit" onclick="event.stopPropagation(); editCategory(' + (item.row || 0) + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')">✎</ button>' +
-        '<button class="acc-word-btn del" onclick="event.stopPropagation(); deleteCategory(' + (item.row || 0) + ')">✕</button>' +
-      '</div></div>';
-    }).join('');
+          '<button class="acc-word-btn edit" onclick="event.stopPropagation(); editCategory(' + (item.row || 0) + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')">✎</button>' +
+          '<button class="acc-word-btn del" onclick="event.stopPropagation(); deleteCategory(' + (item.row || 0) + ')">✕</button>' +
+          '</div></div>';
+      }).join('');
+      
       const totalStr = g.total > 0 ? g.total.toFixed(0) + ' ₽' : '—';
       const totalClass = g.total > 0 ? 'acc-total' : 'acc-total acc-total-empty';
+      
       return '<div class="acc-group ' + style.cls + (isOpen ? ' open' : '') + '" data-cat="' + escapeHtml(g.category) + '">' +
         '<div class="acc-header" onclick="toggleGroup(\'' + escapeJs(g.category) + '\')">' +
           '<span class="acc-emoji">' + style.emoji + '</span>' +
