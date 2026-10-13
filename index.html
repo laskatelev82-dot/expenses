@@ -61,7 +61,6 @@
     .stat-value { font-size: 22px; font-weight: 700; color: #1c1c1e; margin-bottom: 4px; }
     .stat-label { font-size: 13px; color: #8e8e93; }
     .stat-value.green { color: #4CAF50; }
-    
     .recent-item {
       display: flex; justify-content: space-between; align-items: center;
       padding: 12px 8px; border-bottom: 1px solid #f0f0f0;
@@ -78,7 +77,6 @@
       opacity: 0.6; transition: opacity 0.2s; font-family: inherit; color: #ff3b30;
     }
     .delete-btn:active { opacity: 1; }
-    
     .modal {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 1000;
@@ -92,29 +90,15 @@
       max-height: 80vh; display: flex; flex-direction: column; overflow: hidden;
       animation: slideUp 0.25s ease;
     }
-    @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    .modal-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
-    }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
     .modal-title { font-size: 17px; font-weight: 700; color: #1c1c1e; }
-    .modal-close {
-      background: transparent; border: none; font-size: 20px;
-      cursor: pointer; color: #8e8e93; padding: 4px 8px;
-      border-radius: 8px; font-family: inherit;
-    }
+    .modal-close { background: transparent; border: none; font-size: 20px; cursor: pointer; color: #8e8e93; padding: 4px 8px; border-radius: 8px; font-family: inherit; }
     .modal-close:active { background: #f0f0f0; }
     .modal-body { padding: 8px 20px 20px; overflow-y: auto; flex: 1; }
-    
     .acc-group { border-radius: 12px; margin-bottom: 8px; overflow: hidden; transition: all 0.2s; }
     .acc-group:last-child { margin-bottom: 0; }
-    .acc-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 14px 16px; cursor: pointer; transition: all 0.15s; user-select: none;
-    }
+    .acc-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; user-select: none; }
     .acc-header:active { filter: brightness(0.95); }
     .acc-emoji { font-size: 20px; flex-shrink: 0; }
     .acc-name { flex: 1; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -123,22 +107,13 @@
     .acc-group.open .acc-arrow { transform: rotate(90deg); }
     .acc-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
     .acc-group.open .acc-body { max-height: 2000px; }
-    .acc-word {
-      display: flex; align-items: center; gap: 8px;
-      padding: 12px 16px 12px 46px; font-size: 14px;
-      background: rgba(255,255,255,0.5); border-top: 1px solid rgba(0,0,0,0.04);
-    }
+    .acc-word { display: flex; align-items: center; gap: 8px; padding: 12px 16px 12px 46px; font-size: 14px; background: rgba(255,255,255,0.5); border-top: 1px solid rgba(0,0,0,0.04); }
     .acc-word-name { flex: 1; color: #1c1c1e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .acc-word-actions { display: flex; gap: 4px; flex-shrink: 0; }
-    .acc-word-btn {
-      background: rgba(255,255,255,0.7); border: none; cursor: pointer;
-      font-size: 14px; padding: 5px 9px; border-radius: 8px;
-      opacity: 0.7; transition: all 0.15s; font-family: inherit; line-height: 1;
-    }
+    .acc-word-btn { background: rgba(255,255,255,0.7); border: none; cursor: pointer; font-size: 14px; padding: 5px 9px; border-radius: 8px; opacity: 0.7; transition: all 0.15s; font-family: inherit; line-height: 1; }
     .acc-word-btn:active { opacity: 1; transform: scale(0.92); }
     .acc-word-btn.edit { color: #007aff; }
     .acc-word-btn.del { color: #ff3b30; }
-    
     .acc-food      { background: #FFF3E0; color: #E65100; }
     .acc-transport { background: #E3F2FD; color: #0D47A1; }
     .acc-home      { background: #F3E5F5; color: #4A148C; }
@@ -147,41 +122,21 @@
     .acc-shop      { background: #E8F5E9; color: #1B5E20; }
     .acc-comm      { background: #E0F7FA; color: #006064; }
     .acc-default   { background: #ECEFF1; color: #37474F; }
-    
-    .add-cat-btn {
-      background: #4CAF50; color: white; border: none;
-      padding: 8px 14px; border-radius: 10px; font-size: 13px;
-      font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit;
-    }
+    .add-cat-btn { background: #4CAF50; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
     .add-cat-btn:active { background: #45a049; transform: scale(0.96); }
-    
     .edit-form { background: #f9f9fb; padding: 12px; border-radius: 12px; margin-top: 12px; display: none; }
     .edit-form.show { display: block; }
     .edit-form input { margin-bottom: 8px; padding: 10px; font-size: 15px; }
     .edit-form .btn { padding: 12px; font-size: 15px; }
-    
-    .help-toggle {
-      display: flex; justify-content: space-between; align-items: center;
-      cursor: pointer; padding: 4px 0; color: #4CAF50; font-weight: 600; font-size: 15px;
-    }
+    .help-toggle { display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 4px 0; color: #4CAF50; font-weight: 600; font-size: 15px; }
     .help-content { display: none; padding-top: 12px; font-size: 14px; color: #3a3a3c; line-height: 1.7; }
     .help-content.show { display: block; }
     .help-content code { background: #f0f2f5; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
-    
-    .section-title {
-      font-size: 15px; font-weight: 600; color: #8e8e93;
-      text-transform: uppercase; letter-spacing: 0.5px;
-      margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
-    }
+    .section-title { font-size: 15px; font-weight: 600; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
     .category-prompt { background: #fff3cd; padding: 16px; border-radius: 12px; margin-top: 12px; display: none; }
     .category-prompt.show { display: block; }
     .category-prompt p { margin: 0 0 12px; font-size: 15px; color: #856404; }
-    .spinner {
-      display: inline-block; width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: white; border-radius: 50%;
-      animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px;
-    }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -189,19 +144,13 @@
 
   <div class="card">
     <h1>💸 Расходы</h1>
-    <div class="subtitle">Пиши траты или спрашивай ИИ</div>
+    <div class="subtitle">Запись или «Плюша, ...» для ИИ</div>
     <input type="text" id="text" placeholder="кофе 300 или «Плюша, что приготовить?»" autocomplete="off" autofocus>
     <button class="btn" id="btn" onclick="submitExpense()">Отправить</button>
     <div class="result" id="result"></div>
     <div class="stats" style="margin-top: 16px;">
-      <div class="stat-box">
-        <div class="stat-value green" id="todayTotal">—</div>
-        <div class="stat-label">Сегодня</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-value" id="monthTotal">—</div>
-        <div class="stat-label">За месяц</div>
-      </div>
+      <div class="stat-box"><div class="stat-value green" id="todayTotal">—</div><div class="stat-label">Сегодня</div></div>
+      <div class="stat-box"><div class="stat-value" id="monthTotal">—</div><div class="stat-label">За месяц</div></div>
     </div>
     <div class="category-prompt" id="catPrompt">
       <p>🤔 Не знаю категорию для «<b id="catKeyword"></b>».</p>
@@ -241,8 +190,8 @@
       <div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Загрузка...</div>
     </div>
     <div class="edit-form" id="addCatForm">
-      <input type="text" id="newCatKeyword" placeholder="Ключевое слово (например: бассейн)" autocomplete="off">
-      <input type="text" id="newCatValue" placeholder="Категория (например: Спорт)" autocomplete="off">
+      <input type="text" id="newCatKeyword" placeholder="Ключевое слово" autocomplete="off">
+      <input type="text" id="newCatValue" placeholder="Категория" autocomplete="off">
       <button class="btn" onclick="saveNewCategory()">Сохранить</button>
       <button class="btn btn-secondary" onclick="hideAddCategory()">Отменить</button>
     </div>
@@ -253,16 +202,15 @@
       <span>❓ Как пользоваться</span>
       <span id="helpArrow">▼</span>
     </div>
-    <<div class="help-content" id="helpContent">
-  <p><b>📝 Запись расхода:</b> <code>кофе 300</code>, <code>такси 500</code> — мгновенно, без ИИ.</p>
-  <p><b>🤖 ИИ-помощник Плюша:</b> пиши запрос с её именем в начале:</p>
-  <p>• <code>Плюша, на что уходит больше за месяц?</code></p>
-  <p>• <code>Плюша, что приготовить из курицы?</code></p>
-  <p>• <code>Плюша, как сэкономить?</code></p>
-  <p>• <code>Плюша, сколько потратил на такси за неделю?</code></p>
-  <p><b>🏷 Категории:</b> тап на категорию — раскрывается список.</p>
-  <p><b>🕐 Записи:</b> тап на запись — все траты с этим словом.</p>
-</div>
+    <div class="help-content" id="helpContent">
+      <p><b>📝 Запись:</b> <code>кофе 300</code> — мгновенно, без ИИ.</p>
+      <p><b>🤖 ИИ-помощник Плюша:</b> пиши запрос с её именем в начале:</p>
+      <p>• <code>Плюша, на что уходит больше за месяц?</code></p>
+      <p>• <code>Плюша, что приготовить из курицы?</code></p>
+      <p>• <code>Плюша, как сэкономить?</code></p>
+      <p><b>📊 Статистика:</b> <code>сколько потратил за сегодня</code></p>
+    </div>
+  </div>
 
   <div class="modal" id="searchModal" onclick="if(event.target===this)closeSearchModal()">
     <div class="modal-content">
@@ -281,21 +229,21 @@
   let openGroups = {};
 
   const CATEGORY_STYLES = {
-  'еда':         { emoji: '🍔', cls: 'acc-food' },
-  'продукты':    { emoji: '🍔', cls: 'acc-food' },
-  'транспорт':   { emoji: '🚕', cls: 'acc-transport' },
-  'жильё':       { emoji: '🏠', cls: 'acc-home' },
-  'связь':       { emoji: '📱', cls: 'acc-comm' },
-  'здоровье':    { emoji: '🏥', cls: 'acc-health' },
-  'покупки':     { emoji: '🛍', cls: 'acc-shop' },
-  'развлечения': { emoji: '🎉', cls: 'acc-fun' },
-  'маркетплейсы':{ emoji: '📦', cls: 'acc-shop' },
-  'дети':        { emoji: '👶', cls: 'acc-fun' },
-  'кредит':      { emoji: '💳', cls: 'acc-default' },
-  'собака':      { emoji: '🐶', cls: 'acc-shop' },
-  'банк':        { emoji: '🏦', cls: 'acc-default' },
-  'другое':      { emoji: '📦', cls: 'acc-default' }
-};
+    'еда':         { emoji: '🍔', cls: 'acc-food' },
+    'продукты':    { emoji: '🍔', cls: 'acc-food' },
+    'транспорт':   { emoji: '🚕', cls: 'acc-transport' },
+    'жильё':       { emoji: '🏠', cls: 'acc-home' },
+    'связь':       { emoji: '📱', cls: 'acc-comm' },
+    'здоровье':    { emoji: '🏥', cls: 'acc-health' },
+    'покупки':     { emoji: '🛍', cls: 'acc-shop' },
+    'развлечения': { emoji: '🎉', cls: 'acc-fun' },
+    'маркетплейсы':{ emoji: '📦', cls: 'acc-shop' },
+    'дети':        { emoji: '👶', cls: 'acc-fun' },
+    'кредит':      { emoji: '💳', cls: 'acc-default' },
+    'собака':      { emoji: '🐶', cls: 'acc-shop' },
+    'банк':        { emoji: '🏦', cls: 'acc-default' },
+    'другое':      { emoji: '📦', cls: 'acc-default' }
+  };
 
   function getCategoryStyle(cat) {
     const key = String(cat).toLowerCase().trim();
@@ -328,27 +276,7 @@
     });
   }
 
-  async function isSimpleQuery(text) {
-  const lower = text.toLowerCase().trim();
-  
-  // Простая запись расхода: слово + число (с любым регистром)
-  if (/^\s*[а-яёa-z\s]+\s+\d+(?:[.,]\d+)?\s*$/iu.test(text)) return 'add';
-  if (/^\s*\d+(?:[.,]\d+)?\s+[а-яёa-z\s]+\s*$/iu.test(text)) return 'add';
-  
-  // Статистика
-  if (/^(сколько|итого)\s+(потратил|за)/i.test(lower)) return 'stats';
-  
-  // Категории
-  if (/^(покажи|список|какие)\s+(категори|слова)/i.test(lower)) return 'getCategories';
-  
-  // Помощь
-  if (/^(помощь|help|команды)$/i.test(lower)) return 'help';
-  
-  return null;
-}
-
-  async   // Проверка: обращается ли пользователь к ИИ по имени
-    // Проверка: обращается ли пользователь к ИИ по имени
+  // Проверка: позвали ли Плюшу
   function isAICall(text) {
     const lower = text.toLowerCase().trim();
     const names = ['плюша', 'плюш', 'плюшка'];
@@ -359,8 +287,7 @@
     }
     return false;
   }
-  
-  // Убираем имя из начала запроса
+
   function stripAIName(text) {
     const lower = text.toLowerCase().trim();
     const names = ['плюша', 'плюш', 'плюшка'];
@@ -372,6 +299,16 @@
     return text;
   }
 
+  function isSimpleQuery(text) {
+    const lower = text.toLowerCase().trim();
+    if (/^\s*[а-яёa-z\s]+\s+\d+(?:[.,]\d+)?\s*$/iu.test(text)) return 'add';
+    if (/^\s*\d+(?:[.,]\d+)?\s+[а-яёa-z\s]+\s*$/iu.test(text)) return 'add';
+    if (/^(сколько|итого)\s+(потратил|за)/i.test(lower)) return 'stats';
+    if (/^(покажи|список|какие)\s+(категори|слова)/i.test(lower)) return 'getCategories';
+    if (/^(помощь|help|команды)$/i.test(lower)) return 'help';
+    return null;
+  }
+
   async function submitExpense() {
     const input = document.getElementById('text');
     const text = input.value.trim();
@@ -379,12 +316,11 @@
     showLoading(true);
     hideResult();
     
-    // === ИИ-запрос (только если позвали по имени) ===
     if (isAICall(text)) {
       const question = stripAIName(text);
       if (!question) {
         showLoading(false);
-        showResult('ok', '👋 Привет! Я Плюша. Спроси что-нибудь — например: «Плюша, на что уходит больше за месяц?»');
+        showResult('ok', '👋 Привет! Я Плюша. Спроси: «Плюша, на что уходит больше?»');
         return;
       }
       const result = await jsonp({ action: 'ai', text: question });
@@ -401,7 +337,6 @@
       return;
     }
     
-    // === Простые запросы без ИИ ===
     const simpleType = isSimpleQuery(text);
     let result;
     
@@ -432,83 +367,11 @@
       return;
     } else if (simpleType === 'help') {
       showLoading(false);
-      showResult('ok', '💡 Как пользоваться:\n\n' +
-        '📝 Запись: «кофе 300» — мгновенно\n' +
-        '🤖 Плюша: начни с имени «Плюша, ...»\n' +
-        '   • «Плюша, на что уходит больше?»\n' +
-        '   • «Плюша, что приготовить из курицы?»\n' +
-        '   • «Плюша, как сэкономить?»\n' +
-        '📊 Статистика: «сколько потратил за сегодня»');
+      showResult('ok', '💡 Примеры:\n• кофе 300 — запись\n• Плюша, что приготовить? — рецепт\n• Плюша, на что уходит больше? — анализ\n• Плюша, как сэкономить? — совет');
       return;
     } else {
       showLoading(false);
       showResult('err', '🤔 Не понял. Для записи: «кофе 300». Для ИИ: «Плюша, ...»');
-      return;
-    }
-    
-    showLoading(false);
-    if (result && result.ok) {
-      if (result.needCategory) {
-        pendingCategory = { text: text, amount: result.amount, keyword: result.keyword };
-        document.getElementById('catKeyword').textContent = result.keyword;
-        document.getElementById('catPrompt').classList.add('show');
-        document.getElementById('catInput').value = '';
-        document.getElementById('catInput').focus();
-      } else {
-        showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category);
-        input.value = '';
-        input.focus();
-        loadStats();
-        loadRecent();
-      }
-    } else {
-      showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка'));
-    }
-  }
-    
-    // === Простые запросы без ИИ ===
-    const simpleType = isSimpleQuery(text);
-    let result;
-    
-    if (simpleType === 'add') {
-      result = await jsonp({ action: 'add', text: text, who: 'App' });
-    } else if (simpleType === 'stats') {
-      result = await jsonp({ action: 'stats' });
-      showLoading(false);
-      if (result && result.ok) {
-        showResult('ok', '💰 Сегодня: ' + result.today.toFixed(0) + ' ₽\n📅 За месяц: ' + result.month.toFixed(0) + ' ₽');
-      }
-      return;
-    } else if (simpleType === 'getCategories') {
-      result = await jsonp({ action: 'getCategories' });
-      showLoading(false);
-      if (result && result.ok) {
-        const byCat = {};
-        result.items.forEach(function(i) {
-          if (!byCat[i.category]) byCat[i.category] = [];
-          byCat[i.category].push(i.keyword);
-        });
-        let msg = '🏷 Категории:\n\n';
-        Object.keys(byCat).forEach(function(cat) {
-          msg += '• ' + cat + ': ' + byCat[cat].join(', ') + '\n';
-        });
-        showResult('ok', msg);
-      }
-      return;
-    } else if (simpleType === 'help') {
-      showLoading(false);
-      showResult('ok', '💡 Как пользоваться:\n\n' +
-        '📝 Запись: «кофе 300» — мгновенно\n' +
-        '🤖 ИИ: начни с имени «Ассистент, ...»\n' +
-        '   • «Ассистент, на что уходит больше?»\n' +
-        '   • «Ассистент, что приготовить из курицы?»\n' +
-        '   • «Ассистент, как сэкономить?»\n' +
-        '📊 Статистика: «сколько потратил за сегодня»');
-      return;
-    } else {
-      // Не понял — подсказка, без ИИ
-      showLoading(false);
-      showResult('err', '🤔 Не понял. Для записи: «кофе 300». Для ИИ: «Ассистент, ...»');
       return;
     }
     
@@ -694,7 +557,6 @@
       return;
     }
     groupEntries.sort(function(a, b) { return b.items.length - a.items.length; });
-    
     container.innerHTML = groupEntries.map(function(g) {
       const style = getCategoryStyle(g.category);
       const isOpen = openGroups[g.category] || (searchQuery && g.items.length > 0);
@@ -811,7 +673,7 @@
     const btn = document.getElementById('btn');
     if (show) {
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>ИИ думает...';
+      btn.innerHTML = '<span class="spinner"></span>Обрабатываю...';
     } else {
       btn.disabled = false;
       btn.textContent = 'Отправить';
