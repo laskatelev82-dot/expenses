@@ -325,20 +325,59 @@
     });
   }
 
+  async function isSimpleQuery(text) {
+    const lower = text.toLowerCase().trim();
+    if (/^\s*[а-яА-Яa-zA-Z\s]+\s+\d+(?:[.,]\d+)?\s*$/.test(text)) return 'add';
+    if (/^\s*\d+(?:[.,]\d+)?\s+[а-яА-Яa-zA-Z\s]+\s*$/.test(text)) return 'add';
+    if (/^(сколько|итого)\s+(потратил|за)/.test(lower)) return 'stats';
+    if (/^(покажи|список|какие)\s+(категори|слова)/.test(lower)) return 'getCategories';
+    if (/^(помощь|help|команды)$/.test(lower)) return 'help';
+    return null;
+  }
+
   async function submitExpense() {
     const input = document.getElementById('text');
     const text = input.value.trim();
     if (!text) return;
     showLoading(true);
     hideResult();
-    const isSimpleExpense = /^\s*[а-яА-Яa-zA-Z\s]+\s+\d+(?:[.,]\d+)?\s*$/.test(text) 
-      || /^\s*\d+(?:[.,]\d+)?\s+[а-яА-Яa-zA-Z\s]+\s*$/.test(text);
+    
+    const simpleType = isSimpleQuery(text);
     let result;
-    if (isSimpleExpense) {
+    
+    if (simpleType === 'add') {
       result = await jsonp({ action: 'add', text: text, who: 'App' });
+    } else if (simpleType === 'stats') {
+      result = await jsonp({ action: 'stats' });
+      showLoading(false);
+      if (result && result.ok) {
+        showResult('ok', '💰 Сегодня: ' + result.today.toFixed(0) + ' ₽\n📅 За месяц: ' + result.month.toFixed(0) + ' ₽');
+      }
+      return;
+    } else if (simpleType === 'getCategories') {
+      result = await jsonp({ action: 'getCategories' });
+      showLoading(false);
+      if (result && result.ok) {
+        const byCat = {};
+        result.items.forEach(function(i) {
+          if (!byCat[i.category]) byCat[i.category] = [];
+          byCat[i.category].push(i.keyword);
+        });
+        let msg = '🏷 Категории:\n\n';
+        Object.keys(byCat).forEach(function(cat) {
+          msg += '• ' + cat + ': ' + byCat[cat].join(', ') + '\n';
+        });
+        showResult('ok', msg);
+      }
+      return;
+    } else if (simpleType === 'help') {
+      showLoading(false);
+      showResult('ok', '💡 Примеры:\n• кофе 300 — запись\n• на что уходит больше? — анализ\n• сколько на такси за неделю? — поиск\n• что приготовить из курицы? — рецепт\n• как сэкономить? — совет');
+      return;
     } else {
       result = await jsonp({ action: 'ai', text: text });
     }
+    
     showLoading(false);
     if (result && result.ok) {
       if (result.type === 'ai') {
