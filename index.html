@@ -119,81 +119,109 @@
     }
     .delete-btn:active { opacity: 1; }
 
-    /* ======== ПЛИТКИ КАТЕГОРИЙ ======== */
-    .cat-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 8px;
-    }
-    .cat-tile {
-      position: relative;
-      padding: 12px 12px 10px;
-      border-radius: 14px;
-      min-height: 88px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: all 0.2s;
+    /* ======== АККОРДЕОН КАТЕГОРИЙ ======== */
+    .acc-group {
+      border-radius: 12px;
+      margin-bottom: 8px;
       overflow: hidden;
+      transition: all 0.2s;
     }
-    .cat-tile:active { transform: scale(0.98); }
-    
-    .cat-tile-header {
+    .acc-group:last-child { margin-bottom: 0; }
+
+    .acc-header {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      opacity: 0.85;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      gap: 10px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
     }
-    .cat-tile-emoji { font-size: 14px; }
-    
-    .cat-tile-keyword {
-      font-size: 16px;
+    .acc-header:active { filter: brightness(0.95); }
+
+    .acc-emoji {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .acc-name {
+      flex: 1;
+      font-size: 15px;
       font-weight: 600;
-      margin-top: 6px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    
-    .cat-tile-actions {
+    .acc-count {
+      font-size: 13px;
+      opacity: 0.7;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .acc-arrow {
+      font-size: 12px;
+      opacity: 0.6;
+      transition: transform 0.2s;
+      margin-left: 4px;
+    }
+    .acc-group.open .acc-arrow {
+      transform: rotate(90deg);
+    }
+
+    .acc-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .acc-group.open .acc-body {
+      max-height: 2000px;
+    }
+
+    .acc-word {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px 12px 46px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.5);
+      border-top: 1px solid rgba(0,0,0,0.04);
+    }
+    .acc-word-name {
+      flex: 1;
+      color: #1c1c1e;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .acc-word-actions {
       display: flex;
       gap: 4px;
-      align-self: flex-end;
-      margin-top: 6px;
+      flex-shrink: 0;
     }
-    
-    .cat-tile-btn {
-      background: rgba(255,255,255,0.75);
+    .acc-word-btn {
+      background: rgba(255,255,255,0.7);
       border: none;
       cursor: pointer;
       font-size: 14px;
-      padding: 4px 8px;
+      padding: 5px 9px;
       border-radius: 8px;
-      opacity: 0.75;
+      opacity: 0.7;
       transition: all 0.15s;
       font-family: inherit;
       line-height: 1;
-      backdrop-filter: blur(4px);
     }
-    .cat-tile-btn:active { opacity: 1; transform: scale(0.92); }
-    
+    .acc-word-btn:active { opacity: 1; transform: scale(0.92); }
+    .acc-word-btn.edit { color: #007aff; }
+    .acc-word-btn.del { color: #ff3b30; }
+
     /* Цветовые темы */
-    .cat-tile.cat-food      { background: #FFF3E0; color: #E65100; }
-    .cat-tile.cat-transport { background: #E3F2FD; color: #0D47A1; }
-    .cat-tile.cat-home      { background: #F3E5F5; color: #4A148C; }
-    .cat-tile.cat-health    { background: #FFEBEE; color: #B71C1C; }
-    .cat-tile.cat-fun       { background: #FFF9C4; color: #F57F17; }
-    .cat-tile.cat-shop      { background: #E8F5E9; color: #1B5E20; }
-    .cat-tile.cat-comm      { background: #E0F7FA; color: #006064; }
-    .cat-tile.cat-default   { background: #ECEFF1; color: #37474F; }
+    .acc-food      { background: #FFF3E0; color: #E65100; }
+    .acc-transport { background: #E3F2FD; color: #0D47A1; }
+    .acc-home      { background: #F3E5F5; color: #4A148C; }
+    .acc-health    { background: #FFEBEE; color: #B71C1C; }
+    .acc-fun       { background: #FFF9C4; color: #F57F17; }
+    .acc-shop      { background: #E8F5E9; color: #1B5E20; }
+    .acc-comm      { background: #E0F7FA; color: #006064; }
+    .acc-default   { background: #ECEFF1; color: #37474F; }
 
     .add-cat-btn {
       background: #4CAF50;
@@ -306,8 +334,8 @@
       <button class="add-cat-btn" onclick="showAddCategory()">+ Добавить</button>
     </div>
     <input type="text" id="catSearch" class="search-input" placeholder="🔍 Поиск категории..." autocomplete="off" oninput="filterCategories()">
-    <div id="catGrid" class="cat-grid">
-      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px; grid-column: 1 / -1;">Загрузка...</div>
+    <div id="catAccordion">
+      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Загрузка...</div>
     </div>
     
     <div class="edit-form" id="addCatForm">
@@ -331,8 +359,7 @@
       <p>• <code>сколько потратил на такси за неделю?</code></p>
       <p>• <code>сравни этот месяц с прошлым</code></p>
       <p>• <code>добавь бассейн в спорт</code></p>
-      <p>• <code>покажи категории</code></p>
-      <p><b>Удаление:</b> ✕ рядом с записью или «Очистить всё».</p>
+      <p><b>Категории:</b> тапни на категорию — раскроется список слов внутри.</p>
     </div>
   </div>
 
@@ -340,27 +367,27 @@
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwZaU3xfaQqKa1IV6ilnULNIerYocRtEZT7Gb9duB5pgMCFm_OJpBrH8IKL699_byf/exec';
   let pendingCategory = null;
   let allCategories = [];
+  let openGroups = {};  // какие категории раскрыты
 
-  // Эмодзи и цвета для категорий
   const CATEGORY_STYLES = {
-    'еда':         { emoji: '🍔', cls: 'cat-food' },
-    'жрачка':      { emoji: '🍔', cls: 'cat-food' },
-    'продукты':    { emoji: '🍔', cls: 'cat-food' },
-    'транспорт':   { emoji: '🚕', cls: 'cat-transport' },
-    'жильё':       { emoji: '🏠', cls: 'cat-home' },
-    'жилье':       { emoji: '🏠', cls: 'cat-home' },
-    'связь':       { emoji: '📱', cls: 'cat-comm' },
-    'здоровье':    { emoji: '🏥', cls: 'cat-health' },
-    'покупки':     { emoji: '🛍', cls: 'cat-shop' },
-    'развлечения': { emoji: '🎉', cls: 'cat-fun' },
-    'банк':        { emoji: '🏦', cls: 'cat-default' },
-    'другое':      { emoji: '📦', cls: 'cat-default' },
-    'маркетплейсы':{ emoji: '📦', cls: 'cat-shop' }
+    'еда':         { emoji: '🍔', cls: 'acc-food' },
+    'жрачка':      { emoji: '🍔', cls: 'acc-food' },
+    'продукты':    { emoji: '🍔', cls: 'acc-food' },
+    'транспорт':   { emoji: '🚕', cls: 'acc-transport' },
+    'жильё':       { emoji: '🏠', cls: 'acc-home' },
+    'жилье':       { emoji: '🏠', cls: 'acc-home' },
+    'связь':       { emoji: '📱', cls: 'acc-comm' },
+    'здоровье':    { emoji: '🏥', cls: 'acc-health' },
+    'покупки':     { emoji: '🛍', cls: 'acc-shop' },
+    'развлечения': { emoji: '🎉', cls: 'acc-fun' },
+    'банк':        { emoji: '🏦', cls: 'acc-default' },
+    'другое':      { emoji: '📦', cls: 'acc-default' },
+    'маркетплейсы':{ emoji: '📦', cls: 'acc-shop' }
   };
 
   function getCategoryStyle(cat) {
     const key = String(cat).toLowerCase().trim();
-    return CATEGORY_STYLES[key] || { emoji: '🏷', cls: 'cat-default' };
+    return CATEGORY_STYLES[key] || { emoji: '🏷', cls: 'acc-default' };
   }
 
   function jsonp(params) {
@@ -527,54 +554,96 @@
     }).join('');
   }
 
-  // ============ ПЛИТКИ КАТЕГОРИЙ ============
+  // ============ АККОРДЕОН КАТЕГОРИЙ ============
   async function loadCategories() {
     const data = await jsonp({ action: 'getCategories' });
     if (!data || !data.ok) {
-      document.getElementById('catGrid').innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px; grid-column: 1 / -1;">Ошибка загрузки</div>';
+      document.getElementById('catAccordion').innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Ошибка загрузки</div>';
       return;
     }
     allCategories = data.items || [];
-    renderCategories();
+    renderAccordion();
   }
 
-  function renderCategories() {
-    const grid = document.getElementById('catGrid');
+  function renderAccordion() {
+    const container = document.getElementById('catAccordion');
     if (allCategories.length === 0) {
-      grid.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px; grid-column: 1 / -1;">Нет категорий</div>';
+      container.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Нет категорий</div>';
       return;
     }
     
     const searchQuery = (document.getElementById('catSearch').value || '').toLowerCase().trim();
-    const filtered = allCategories.filter(function(item) {
-      if (!searchQuery) return true;
-      return item.keyword.toLowerCase().indexOf(searchQuery) !== -1
-          || item.category.toLowerCase().indexOf(searchQuery) !== -1;
+    
+    // Группируем по категориям
+    const groups = {};
+    allCategories.forEach(function(item) {
+      const cat = item.category;
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(item);
     });
     
-    if (filtered.length === 0) {
-      grid.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px; grid-column: 1 / -1;">Ничего не найдено</div>';
+    // Фильтруем по поисковому запросу
+    let groupEntries = Object.keys(groups).map(function(cat) {
+      return { category: cat, items: groups[cat] };
+    });
+    
+    if (searchQuery) {
+      groupEntries = groupEntries.filter(function(g) {
+        if (g.category.toLowerCase().indexOf(searchQuery) !== -1) return true;
+        return g.items.some(function(i) { return i.keyword.toLowerCase().indexOf(searchQuery) !== -1; });
+      });
+    }
+    
+    if (groupEntries.length === 0) {
+      container.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Ничего не найдено</div>';
       return;
     }
     
-    grid.innerHTML = filtered.map(function(item) {
-      const style = getCategoryStyle(item.category);
-      return '<div class="cat-tile ' + style.cls + '">' +
-        '<div class="cat-tile-header">' +
-          '<span class="cat-tile-emoji">' + style.emoji + '</span>' +
-          '<span>' + escapeHtml(item.category) + '</span>' +
+    // Сортируем: сначала крупные группы
+    groupEntries.sort(function(a, b) { return b.items.length - a.items.length; });
+    
+    container.innerHTML = groupEntries.map(function(g) {
+      const style = getCategoryStyle(g.category);
+      const isOpen = openGroups[g.category] || (searchQuery && g.items.length > 0);
+      
+      // Если идёт поиск, раскрываем группы с найденными словами
+      let visibleItems = g.items;
+      if (searchQuery) {
+        visibleItems = g.items.filter(function(i) {
+          return i.keyword.toLowerCase().indexOf(searchQuery) !== -1
+              || g.category.toLowerCase().indexOf(searchQuery) !== -1;
+        });
+      }
+      
+      const wordsHtml = visibleItems.map(function(item) {
+        return '<div class="acc-word">' +
+          '<div class="acc-word-name">' + escapeHtml(item.keyword) + '</div>' +
+          '<div class="acc-word-actions">' +
+          '<button class="acc-word-btn edit" onclick="event.stopPropagation(); editCategory(' + item.row + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')" title="Редактировать">✎</button>' +
+          '<button class="acc-word-btn del" onclick="event.stopPropagation(); deleteCategory(' + item.row + ')" title="Удалить">✕</button>' +
+          '</div>' +
+          '</div>';
+      }).join('');
+      
+      return '<div class="acc-group ' + style.cls + (isOpen ? ' open' : '') + '" data-cat="' + escapeHtml(g.category) + '">' +
+        '<div class="acc-header" onclick="toggleGroup(\'' + escapeJs(g.category) + '\')">' +
+          '<span class="acc-emoji">' + style.emoji + '</span>' +
+          '<span class="acc-name">' + escapeHtml(g.category) + '</span>' +
+          '<span class="acc-count">' + g.items.length + '</span>' +
+          '<span class="acc-arrow">▶</span>' +
         '</div>' +
-        '<div class="cat-tile-keyword">' + escapeHtml(item.keyword) + '</div>' +
-        '<div class="cat-tile-actions">' +
-          '<button class="cat-tile-btn" onclick="event.stopPropagation(); editCategory(' + item.row + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')" title="Редактировать">✎</button>' +
-          '<button class="cat-tile-btn" onclick="event.stopPropagation(); deleteCategory(' + item.row + ')" title="Удалить">✕</button>' +
-        '</div>' +
+        '<div class="acc-body">' + wordsHtml + '</div>' +
         '</div>';
     }).join('');
   }
 
+  function toggleGroup(category) {
+    openGroups[category] = !openGroups[category];
+    renderAccordion();
+  }
+
   function filterCategories() {
-    renderCategories();
+    renderAccordion();
   }
 
   function escapeJs(str) {
