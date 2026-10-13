@@ -52,6 +52,12 @@
     }
     input[type=text]:focus { outline: none; border-color: #4CAF50; background: white; }
 
+    .search-input {
+      padding: 10px 14px;
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
     .btn {
       width: 100%; padding: 16px; font-size: 17px; font-weight: 600;
       background: #4CAF50; color: white;
@@ -113,65 +119,82 @@
     }
     .delete-btn:active { opacity: 1; }
 
-    /* ======== КАТЕГОРИИ (новый вид) ======== */
-    .cat-item {
+    /* ======== ПЛИТКИ КАТЕГОРИЙ ======== */
+    .cat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .cat-tile {
+      position: relative;
+      padding: 12px 12px 10px;
+      border-radius: 14px;
+      min-height: 88px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s;
+      overflow: hidden;
+    }
+    .cat-tile:active { transform: scale(0.98); }
+    
+    .cat-tile-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
-      background: #f9f9fb;
-      border-radius: 12px;
-      margin-bottom: 8px;
-      transition: background 0.2s;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      opacity: 0.85;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    .cat-item:active { background: #f0f0f5; }
-    .cat-item:last-child { margin-bottom: 0; }
+    .cat-tile-emoji { font-size: 14px; }
     
-    .cat-keyword {
-      flex: 1;
+    .cat-tile-keyword {
+      font-size: 16px;
       font-weight: 600;
-      color: #1c1c1e;
-      font-size: 15px;
+      margin-top: 6px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
     
-    .cat-chip {
-      display: inline-block;
-      padding: 4px 10px;
-      background: #e8f5e9;
-      color: #2e7d32;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    
-    .cat-actions {
+    .cat-tile-actions {
       display: flex;
       gap: 4px;
-      flex-shrink: 0;
+      align-self: flex-end;
+      margin-top: 6px;
     }
     
-    .cat-icon-btn {
-      background: transparent;
+    .cat-tile-btn {
+      background: rgba(255,255,255,0.75);
       border: none;
       cursor: pointer;
-      font-size: 16px;
-      padding: 6px 8px;
+      font-size: 14px;
+      padding: 4px 8px;
       border-radius: 8px;
-      opacity: 0.7;
-      transition: all 0.2s;
+      opacity: 0.75;
+      transition: all 0.15s;
       font-family: inherit;
       line-height: 1;
+      backdrop-filter: blur(4px);
     }
-    .cat-icon-btn:active { opacity: 1; }
-    .cat-icon-btn.edit { color: #007aff; }
-    .cat-icon-btn.edit:active { background: #e3f2fd; }
-    .cat-icon-btn.del { color: #ff3b30; }
-    .cat-icon-btn.del:active { background: #ffebee; }
+    .cat-tile-btn:active { opacity: 1; transform: scale(0.92); }
     
+    /* Цветовые темы */
+    .cat-tile.cat-food      { background: #FFF3E0; color: #E65100; }
+    .cat-tile.cat-transport { background: #E3F2FD; color: #0D47A1; }
+    .cat-tile.cat-home      { background: #F3E5F5; color: #4A148C; }
+    .cat-tile.cat-health    { background: #FFEBEE; color: #B71C1C; }
+    .cat-tile.cat-fun       { background: #FFF9C4; color: #F57F17; }
+    .cat-tile.cat-shop      { background: #E8F5E9; color: #1B5E20; }
+    .cat-tile.cat-comm      { background: #E0F7FA; color: #006064; }
+    .cat-tile.cat-default   { background: #ECEFF1; color: #37474F; }
+
     .add-cat-btn {
       background: #4CAF50;
       color: white;
@@ -282,8 +305,9 @@
       <span>🏷 Категории</span>
       <button class="add-cat-btn" onclick="showAddCategory()">+ Добавить</button>
     </div>
-    <div id="catList" style="margin-top: 4px;">
-      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Загрузка...</div>
+    <input type="text" id="catSearch" class="search-input" placeholder="🔍 Поиск категории..." autocomplete="off" oninput="filterCategories()">
+    <div id="catGrid" class="cat-grid">
+      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px; grid-column: 1 / -1;">Загрузка...</div>
     </div>
     
     <div class="edit-form" id="addCatForm">
@@ -315,6 +339,29 @@
 <script>
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwZaU3xfaQqKa1IV6ilnULNIerYocRtEZT7Gb9duB5pgMCFm_OJpBrH8IKL699_byf/exec';
   let pendingCategory = null;
+  let allCategories = [];
+
+  // Эмодзи и цвета для категорий
+  const CATEGORY_STYLES = {
+    'еда':         { emoji: '🍔', cls: 'cat-food' },
+    'жрачка':      { emoji: '🍔', cls: 'cat-food' },
+    'продукты':    { emoji: '🍔', cls: 'cat-food' },
+    'транспорт':   { emoji: '🚕', cls: 'cat-transport' },
+    'жильё':       { emoji: '🏠', cls: 'cat-home' },
+    'жилье':       { emoji: '🏠', cls: 'cat-home' },
+    'связь':       { emoji: '📱', cls: 'cat-comm' },
+    'здоровье':    { emoji: '🏥', cls: 'cat-health' },
+    'покупки':     { emoji: '🛍', cls: 'cat-shop' },
+    'развлечения': { emoji: '🎉', cls: 'cat-fun' },
+    'банк':        { emoji: '🏦', cls: 'cat-default' },
+    'другое':      { emoji: '📦', cls: 'cat-default' },
+    'маркетплейсы':{ emoji: '📦', cls: 'cat-shop' }
+  };
+
+  function getCategoryStyle(cat) {
+    const key = String(cat).toLowerCase().trim();
+    return CATEGORY_STYLES[key] || { emoji: '🏷', cls: 'cat-default' };
+  }
 
   function jsonp(params) {
     return new Promise((resolve) => {
@@ -480,24 +527,54 @@
     }).join('');
   }
 
-  // ============ КАТЕГОРИИ (новый вид) ============
+  // ============ ПЛИТКИ КАТЕГОРИЙ ============
   async function loadCategories() {
     const data = await jsonp({ action: 'getCategories' });
-    const list = document.getElementById('catList');
-    if (!data || !data.ok || !data.items || data.items.length === 0) {
-      list.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Нет категорий</div>';
+    if (!data || !data.ok) {
+      document.getElementById('catGrid').innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px; grid-column: 1 / -1;">Ошибка загрузки</div>';
       return;
     }
-    list.innerHTML = data.items.map(function(item) {
-      return '<div class="cat-item">' +
-        '<div class="cat-keyword">' + escapeHtml(item.keyword) + '</div>' +
-        '<div class="cat-chip">' + escapeHtml(item.category) + '</div>' +
-        '<div class="cat-actions">' +
-        '<button class="cat-icon-btn edit" onclick="editCategory(' + item.row + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')" title="Редактировать">✎</button>' +
-        '<button class="cat-icon-btn del" onclick="deleteCategory(' + item.row + ')" title="Удалить">✕</button>' +
+    allCategories = data.items || [];
+    renderCategories();
+  }
+
+  function renderCategories() {
+    const grid = document.getElementById('catGrid');
+    if (allCategories.length === 0) {
+      grid.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px; grid-column: 1 / -1;">Нет категорий</div>';
+      return;
+    }
+    
+    const searchQuery = (document.getElementById('catSearch').value || '').toLowerCase().trim();
+    const filtered = allCategories.filter(function(item) {
+      if (!searchQuery) return true;
+      return item.keyword.toLowerCase().indexOf(searchQuery) !== -1
+          || item.category.toLowerCase().indexOf(searchQuery) !== -1;
+    });
+    
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px; grid-column: 1 / -1;">Ничего не найдено</div>';
+      return;
+    }
+    
+    grid.innerHTML = filtered.map(function(item) {
+      const style = getCategoryStyle(item.category);
+      return '<div class="cat-tile ' + style.cls + '">' +
+        '<div class="cat-tile-header">' +
+          '<span class="cat-tile-emoji">' + style.emoji + '</span>' +
+          '<span>' + escapeHtml(item.category) + '</span>' +
+        '</div>' +
+        '<div class="cat-tile-keyword">' + escapeHtml(item.keyword) + '</div>' +
+        '<div class="cat-tile-actions">' +
+          '<button class="cat-tile-btn" onclick="event.stopPropagation(); editCategory(' + item.row + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')" title="Редактировать">✎</button>' +
+          '<button class="cat-tile-btn" onclick="event.stopPropagation(); deleteCategory(' + item.row + ')" title="Удалить">✕</button>' +
         '</div>' +
         '</div>';
     }).join('');
+  }
+
+  function filterCategories() {
+    renderCategories();
   }
 
   function escapeJs(str) {
