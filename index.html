@@ -113,19 +113,80 @@
     }
     .delete-btn:active { opacity: 1; }
 
+    /* ======== КАТЕГОРИИ (новый вид) ======== */
     .cat-item {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #f9f9fb;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      transition: background 0.2s;
     }
-    .cat-item:last-child { border-bottom: none; }
-    .cat-keyword { flex: 1; font-weight: 500; color: #1c1c1e; }
-    .cat-arrow { color: #8e8e93; font-size: 14px; }
-    .cat-value { font-weight: 600; color: #4CAF50; }
-    .cat-actions { display: flex; gap: 4px; }
-    .cat-edit { background: transparent; border: none; cursor: pointer; font-size: 16px; padding: 4px 8px; opacity: 0.6; color: #007aff; }
-    .cat-edit:active { opacity: 1; }
+    .cat-item:active { background: #f0f0f5; }
+    .cat-item:last-child { margin-bottom: 0; }
+    
+    .cat-keyword {
+      flex: 1;
+      font-weight: 600;
+      color: #1c1c1e;
+      font-size: 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .cat-chip {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    .cat-actions {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    
+    .cat-icon-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      opacity: 0.7;
+      transition: all 0.2s;
+      font-family: inherit;
+      line-height: 1;
+    }
+    .cat-icon-btn:active { opacity: 1; }
+    .cat-icon-btn.edit { color: #007aff; }
+    .cat-icon-btn.edit:active { background: #e3f2fd; }
+    .cat-icon-btn.del { color: #ff3b30; }
+    .cat-icon-btn.del:active { background: #ffebee; }
+    
+    .add-cat-btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .add-cat-btn:active { background: #45a049; transform: scale(0.96); }
 
-    .edit-form { background: #f9f9fb; padding: 12px; border-radius: 12px; margin-top: 8px; display: none; }
+    .edit-form { background: #f9f9fb; padding: 12px; border-radius: 12px; margin-top: 12px; display: none; }
     .edit-form.show { display: block; }
     .edit-form input { margin-bottom: 8px; padding: 10px; font-size: 15px; }
     .edit-form .btn { padding: 12px; font-size: 15px; }
@@ -219,10 +280,10 @@
   <div class="card">
     <div class="section-title">
       <span>🏷 Категории</span>
-      <button class="cat-edit" style="font-size:13px;" onclick="showAddCategory()">+ Добавить</button>
+      <button class="add-cat-btn" onclick="showAddCategory()">+ Добавить</button>
     </div>
-    <div id="catList">
-      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div>
+    <div id="catList" style="margin-top: 4px;">
+      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Загрузка...</div>
     </div>
     
     <div class="edit-form" id="addCatForm">
@@ -244,10 +305,8 @@
       <p><b>ИИ-запросы (любой текст):</b></p>
       <p>• <code>на что уходит больше всего за месяц?</code></p>
       <p>• <code>сколько потратил на такси за неделю?</code></p>
-      <p>• <code>покажи траты больше 1000</code></p>
       <p>• <code>сравни этот месяц с прошлым</code></p>
       <p>• <code>добавь бассейн в спорт</code></p>
-      <p>• <code>удали кофе</code></p>
       <p>• <code>покажи категории</code></p>
       <p><b>Удаление:</b> ✕ рядом с записью или «Очистить всё».</p>
     </div>
@@ -282,7 +341,7 @@
           delete window[callbackName];
           if (script.parentNode) script.parentNode.removeChild(script);
         }
-      }, 30000);
+      }, 60000);
     });
   }
 
@@ -294,8 +353,6 @@
     showLoading(true);
     hideResult();
 
-    // Если короткая фраза с суммой — запись расхода
-    // Если длинный вопрос — идём в ИИ
     const isSimpleExpense = /^\s*[а-яА-Яa-zA-Z\s]+\s+\d+(?:[.,]\d+)?\s*$/.test(text) 
       || /^\s*\d+(?:[.,]\d+)?\s+[а-яА-Яa-zA-Z\s]+\s*$/.test(text);
     
@@ -423,22 +480,21 @@
     }).join('');
   }
 
-  // ============ КАТЕГОРИИ ============
+  // ============ КАТЕГОРИИ (новый вид) ============
   async function loadCategories() {
     const data = await jsonp({ action: 'getCategories' });
     const list = document.getElementById('catList');
     if (!data || !data.ok || !data.items || data.items.length === 0) {
-      list.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Нет категорий</div>';
+      list.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Нет категорий</div>';
       return;
     }
     list.innerHTML = data.items.map(function(item) {
       return '<div class="cat-item">' +
         '<div class="cat-keyword">' + escapeHtml(item.keyword) + '</div>' +
-        '<div class="cat-arrow">→</div>' +
-        '<div class="cat-value">' + escapeHtml(item.category) + '</div>' +
+        '<div class="cat-chip">' + escapeHtml(item.category) + '</div>' +
         '<div class="cat-actions">' +
-        '<button class="cat-edit" onclick="editCategory(' + item.row + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')">✎</button>' +
-        '<button class="delete-btn" onclick="deleteCategory(' + item.row + ')">✕</button>' +
+        '<button class="cat-icon-btn edit" onclick="editCategory(' + item.row + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')" title="Редактировать">✎</button>' +
+        '<button class="cat-icon-btn del" onclick="deleteCategory(' + item.row + ')" title="Удалить">✕</button>' +
         '</div>' +
         '</div>';
     }).join('');
@@ -525,7 +581,7 @@
     const btn = document.getElementById('btn');
     if (show) {
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>Обрабатываю...';
+      btn.innerHTML = '<span class="spinner"></span>ИИ думает...';
     } else {
       btn.disabled = false;
       btn.textContent = 'Отправить';
