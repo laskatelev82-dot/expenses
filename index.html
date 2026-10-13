@@ -8,6 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Расходы">
   <meta name="application-name" content="Расходы">
+  <link rel="manifest" href="manifest.json">
   <title>Расходы</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -103,10 +104,12 @@
     .acc-emoji { font-size: 20px; flex-shrink: 0; }
     .acc-name { flex: 1; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .acc-count { font-size: 13px; opacity: 0.7; font-weight: 500; white-space: nowrap; }
+    .acc-total { font-size: 14px; font-weight: 700; color: #1c1c1e; margin-left: 6px; white-space: nowrap; }
+    .acc-total-empty { opacity: 0.4; font-weight: 400; color: #8e8e93; }
     .acc-arrow { font-size: 12px; opacity: 0.6; transition: transform 0.2s; margin-left: 4px; }
     .acc-group.open .acc-arrow { transform: rotate(90deg); }
     .acc-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-    .acc-group.open .acc-body { max-height: 2000px; }
+    .acc-group.open .acc-body { max-height: 3000px; }
     .acc-word { display: flex; align-items: center; gap: 8px; padding: 12px 16px 12px 46px; font-size: 14px; background: rgba(255,255,255,0.5); border-top: 1px solid rgba(0,0,0,0.04); }
     .acc-word-name { flex: 1; color: #1c1c1e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .acc-word-actions { display: flex; gap: 4px; flex-shrink: 0; }
@@ -180,9 +183,9 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" id="catSection">
     <div class="section-title">
-      <span>🏷 Категории</span>
+      <span id="catSectionTitle">🏷 Категории</span>
       <button class="add-cat-btn" onclick="showAddCategory()">+ Добавить</button>
     </div>
     <input type="text" id="catSearch" class="search-input" placeholder="🔍 Поиск категории..." autocomplete="off" oninput="filterCategories()">
@@ -203,12 +206,14 @@
       <span id="helpArrow">▼</span>
     </div>
     <div class="help-content" id="helpContent">
-      <p><b>📝 Запись:</b> <code>кофе 300</code> — мгновенно, без ИИ.</p>
-      <p><b>🤖 ИИ-помощник Плюша:</b> пиши запрос с её именем в начале:</p>
+      <p><b>📝 Запись:</b> <code>кофе 300</code> — мгновенно.</p>
+      <p><b>🤖 ИИ-помощник Плюша:</b> начни запрос с её имени:</p>
+      <p>• <code>Плюша, создай категорию Кружки</code></p>
+      <p>• <code>Плюша, добавь бассейн в Кружки</code></p>
       <p>• <code>Плюша, на что уходит больше за месяц?</code></p>
       <p>• <code>Плюша, что приготовить из курицы?</code></p>
       <p>• <code>Плюша, как сэкономить?</code></p>
-      <p><b>📊 Статистика:</b> <code>сколько потратил за сегодня</code></p>
+      <p><b>🏷 Категории:</b> тап на категорию — раскрыть список слов. Суммы — за всё время.</p>
     </div>
   </div>
 
@@ -227,6 +232,7 @@
   let pendingCategory = null;
   let allCategories = [];
   let openGroups = {};
+  let categoryTotals = {};
 
   const CATEGORY_STYLES = {
     'еда':         { emoji: '🍔', cls: 'acc-food' },
@@ -237,6 +243,7 @@
     'здоровье':    { emoji: '🏥', cls: 'acc-health' },
     'покупки':     { emoji: '🛍', cls: 'acc-shop' },
     'развлечения': { emoji: '🎉', cls: 'acc-fun' },
+    'кружки':      { emoji: '🎨', cls: 'acc-fun' },
     'маркетплейсы':{ emoji: '📦', cls: 'acc-shop' },
     'дети':        { emoji: '👶', cls: 'acc-fun' },
     'кредит':      { emoji: '💳', cls: 'acc-default' },
@@ -276,14 +283,11 @@
     });
   }
 
-  // Проверка: позвали ли Плюшу
   function isAICall(text) {
     const lower = text.toLowerCase().trim();
     const names = ['плюша', 'плюш', 'плюшка'];
     for (const name of names) {
-      if (lower.startsWith(name) || lower.startsWith(name + ',') || lower.startsWith(name + ' ')) {
-        return true;
-      }
+      if (lower.startsWith(name) || lower.startsWith(name + ',') || lower.startsWith(name + ' ')) return true;
     }
     return false;
   }
@@ -367,7 +371,7 @@
       return;
     } else if (simpleType === 'help') {
       showLoading(false);
-      showResult('ok', '💡 Примеры:\n• кофе 300 — запись\n• Плюша, что приготовить? — рецепт\n• Плюша, на что уходит больше? — анализ\n• Плюша, как сэкономить? — совет');
+      showResult('ok', '💡 Примеры:\n• кофе 300 — запись\n• Плюша, создай категорию Кружки\n• Плюша, что приготовить?\n• Плюша, на что уходит больше?');
       return;
     } else {
       showLoading(false);
@@ -521,12 +525,29 @@
   }
 
   async function loadCategories() {
-    const data = await jsonp({ action: 'getCategories' });
+    const data = await jsonp({ action: 'getCategoriesWithTotals' });
     if (!data || !data.ok) {
       document.getElementById('catAccordion').innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Ошибка загрузки</div>';
       return;
     }
-    allCategories = data.items || [];
+    
+    allCategories = [];
+    categoryTotals = {};
+    let grandTotal = 0;
+    
+    for (const g of data.groups) {
+      for (const it of g.items) {
+        allCategories.push({ keyword: it.keyword, category: it.category, row: it.row });
+      }
+      categoryTotals[g.category] = g.total || 0;
+      grandTotal += g.total || 0;
+    }
+    
+    const title = document.getElementById('catSectionTitle');
+    if (title) {
+      title.textContent = '🏷 Категории · ' + grandTotal.toFixed(0) + ' ₽';
+    }
+    
     renderAccordion();
   }
 
@@ -544,7 +565,7 @@
       groups[cat].push(item);
     });
     let groupEntries = Object.keys(groups).map(function(cat) {
-      return { category: cat, items: groups[cat] };
+      return { category: cat, items: groups[cat], total: categoryTotals[cat] || 0 };
     });
     if (searchQuery) {
       groupEntries = groupEntries.filter(function(g) {
@@ -556,7 +577,8 @@
       container.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Ничего не найдено</div>';
       return;
     }
-    groupEntries.sort(function(a, b) { return b.items.length - a.items.length; });
+    groupEntries.sort(function(a, b) { return b.total - a.total; });
+    
     container.innerHTML = groupEntries.map(function(g) {
       const style = getCategoryStyle(g.category);
       const isOpen = openGroups[g.category] || (searchQuery && g.items.length > 0);
@@ -571,15 +593,18 @@
         return '<div class="acc-word">' +
           '<div class="acc-word-name">' + escapeHtml(item.keyword) + '</div>' +
           '<div class="acc-word-actions">' +
-          '<button class="acc-word-btn edit" onclick="event.stopPropagation(); editCategory(' + item.row + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')">✎</button>' +
-          '<button class="acc-word-btn del" onclick="event.stopPropagation(); deleteCategory(' + item.row + ')">✕</button>' +
+          '<button class="acc-word-btn edit" onclick="event.stopPropagation(); editCategory(' + (item.row || 0) + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')">✎</button>' +
+          '<button class="acc-word-btn del" onclick="event.stopPropagation(); deleteCategory(' + (item.row || 0) + ')">✕</button>' +
           '</div></div>';
       }).join('');
+      const totalStr = g.total > 0 ? g.total.toFixed(0) + ' ₽' : '—';
+      const totalClass = g.total > 0 ? 'acc-total' : 'acc-total acc-total-empty';
       return '<div class="acc-group ' + style.cls + (isOpen ? ' open' : '') + '" data-cat="' + escapeHtml(g.category) + '">' +
         '<div class="acc-header" onclick="toggleGroup(\'' + escapeJs(g.category) + '\')">' +
           '<span class="acc-emoji">' + style.emoji + '</span>' +
           '<span class="acc-name">' + escapeHtml(g.category) + '</span>' +
           '<span class="acc-count">' + g.items.length + '</span>' +
+          '<span class="' + totalClass + '">' + totalStr + '</span>' +
           '<span class="acc-arrow">▶</span>' +
         '</div>' +
         '<div class="acc-body">' + wordsHtml + '</div>' +
@@ -697,6 +722,16 @@
   loadStats();
   loadRecent();
   loadCategories();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('sw.js').then(function(reg) {
+        console.log('SW OK:', reg.scope);
+      }).catch(function(err) {
+        console.log('SW error:', err);
+      });
+    });
+  }
 </script>
 </body>
 </html>
