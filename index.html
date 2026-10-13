@@ -202,29 +202,54 @@
   }
 
   async function submitExpense() {
-    const input = document.getElementById('text');
-    const text = input.value.trim();
-    if (!text) return;
-    showLoading(true);
-    hideResult();
-    const result = await jsonp({ action: 'add', text: text, who: 'App' });
-    showLoading(false);
-    if (result && result.ok) {
-      showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category);
+  const input = document.getElementById('text');
+  const text = input.value.trim();
+  if (!text) return;
+
+  showLoading(true);
+  hideResult();
+
+  // Если это запись расхода (короткая фраза с суммой) — пишем напрямую
+  // Если длинный вопрос/команда — идём в ИИ
+  const isSimpleExpense = /^\s*[а-яА-Яa-zA-Z\s]+\s+\d+(?:[.,]\d+)?\s*$/.test(text) 
+    || /^\s*\d+(?:[.,]\d+)?\s+[а-яА-Яa-zA-Z\s]+\s*$/.test(text);
+  
+  let result;
+  if (isSimpleExpense) {
+    result = await jsonp({ action: 'add', text: text, who: 'App' });
+  } else {
+    result = await jsonp({ action: 'ai', text: text });
+  }
+  
+  showLoading(false);
+
+  if (result && result.ok) {
+    // ИИ-ответ
+    if (result.type === 'ai') {
+      showResult('ok', '🤖 ' + result.message);
       input.value = '';
-      input.focus();
       loadStats();
       loadRecent();
-    } else if (result && result.needCategory) {
-      pendingCategory = { text: text, amount: result.amount, keyword: result.keyword };
-      document.getElementById('catKeyword').textContent = result.keyword;
-      document.getElementById('catPrompt').classList.add('show');
-      document.getElementById('catInput').value = '';
-      document.getElementById('catInput').focus();
-    } else {
-      showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка'));
+      loadCategories();
+      return;
     }
+    // Обычная запись
+    const src = result.source === 'ai' ? ' 🤖' : '';
+    showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category + src);
+    input.value = '';
+    input.focus();
+    loadStats();
+    loadRecent();
+  } else if (result && result.needCategory) {
+    pendingCategory = { text: text, amount: result.amount, keyword: result.keyword };
+    document.getElementById('catKeyword').textContent = result.keyword;
+    document.getElementById('catPrompt').classList.add('show');
+    document.getElementById('catInput').value = '';
+    document.getElementById('catInput').focus();
+  } else {
+    showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка'));
   }
+}
 
   async function submitCategory() {
     if (!pendingCategory) return;
