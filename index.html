@@ -23,6 +23,16 @@
     }
     .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     h1 { font-size: 24px; margin: 0 0 4px; font-weight: 700; }
+    .acc-word-total {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1c1c1e;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+    .acc-word-total-empty {
+      display: none;
+    }
     .subtitle { color: #8e8e93; font-size: 14px; margin-bottom: 20px; }
     input[type=text] {
       width: 100%; padding: 16px; font-size: 17px;
@@ -590,13 +600,16 @@
         });
       }
       const wordsHtml = visibleItems.map(function(item) {
-        return '<div class="acc-word">' +
-          '<div class="acc-word-name">' + escapeHtml(item.keyword) + '</div>' +
+       const wordTotal = item.total > 0 ? item.total.toFixed(0) + ' ₽' : '';
+       const wordTotalClass = item.total > 0 ? 'acc-word-total' : 'acc-word-total acc-word-total-empty';
+       return '<div class="acc-word">' +
+         '<div class="acc-word-name">' + escapeHtml(item.keyword) + '</div>' +
+         '<div class="' + wordTotalClass + '">' + wordTotal + '</div>' +
           '<div class="acc-word-actions">' +
-          '<button class="acc-word-btn edit" onclick="event.stopPropagation(); editCategory(' + (item.row || 0) + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')">✎</button>' +
-          '<button class="acc-word-btn del" onclick="event.stopPropagation(); deleteCategory(' + (item.row || 0) + ')">✕</button>' +
-          '</div></div>';
-      }).join('');
+        '<button class="acc-word-btn edit" onclick="event.stopPropagation(); editCategory(' + (item.row || 0) + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')">✎</ button>' +
+        '<button class="acc-word-btn del" onclick="event.stopPropagation(); deleteCategory(' + (item.row || 0) + ')">✕</button>' +
+      '</div></div>';
+    }).join('');
       const totalStr = g.total > 0 ? g.total.toFixed(0) + ' ₽' : '—';
       const totalClass = g.total > 0 ? 'acc-total' : 'acc-total acc-total-empty';
       return '<div class="acc-group ' + style.cls + (isOpen ? ' open' : '') + '" data-cat="' + escapeHtml(g.category) + '">' +
