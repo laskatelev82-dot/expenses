@@ -11,38 +11,18 @@
   <title>Расходы</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
-    html, body {
-      overscroll-behavior: none;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-
+    html, body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      margin: 0;
-      padding: 16px;
+      margin: 0; padding: 16px;
       padding-top: calc(16px + env(safe-area-inset-top));
       padding-bottom: calc(16px + env(safe-area-inset-bottom));
-      background: #f0f2f5;
-      min-height: 100vh;
-      color: #1c1c1e;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+      background: #f0f2f5; min-height: 100vh; color: #1c1c1e;
+      max-width: 600px; margin-left: auto; margin-right: auto;
     }
-
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
+    .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     h1 { font-size: 24px; margin: 0 0 4px; font-weight: 700; }
     .subtitle { color: #8e8e93; font-size: 14px; margin-bottom: 20px; }
-
     input[type=text] {
       width: 100%; padding: 16px; font-size: 17px;
       border: 2px solid #e5e5ea; border-radius: 12px;
@@ -51,169 +31,116 @@
       -webkit-user-select: text; user-select: text;
     }
     input[type=text]:focus { outline: none; border-color: #4CAF50; background: white; }
-
-    .search-input {
-      padding: 10px 14px;
-      font-size: 15px;
-      margin-bottom: 12px;
-    }
-
+    .search-input { padding: 10px 14px; font-size: 15px; margin-bottom: 12px; }
     .btn {
       width: 100%; padding: 16px; font-size: 17px; font-weight: 600;
-      background: #4CAF50; color: white;
-      border: none; border-radius: 12px; cursor: pointer;
+      background: #4CAF50; color: white; border: none; border-radius: 12px; cursor: pointer;
       transition: all 0.2s; font-family: inherit;
     }
     .btn:active { background: #45a049; transform: scale(0.98); }
     .btn:disabled { background: #ccc; cursor: not-allowed; }
     .btn-secondary { background: #f0f2f5; color: #1c1c1e; margin-top: 8px; }
     .btn-secondary:active { background: #e5e5ea; }
-
     .result {
       margin-top: 12px; padding: 14px; border-radius: 12px;
-      font-size: 15px; display: none;
-      animation: slideIn 0.3s ease;
-      white-space: pre-wrap;
-      word-wrap: break-word;
+      font-size: 15px; display: none; animation: slideIn 0.3s ease;
+      white-space: pre-wrap; word-wrap: break-word;
     }
     .ok { background: #d4edda; color: #155724; display: block; }
     .err { background: #f8d7da; color: #721c24; display: block; }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .quick-buttons {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 8px; margin-top: 8px;
-    }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .quick-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
     .quick-btn {
       padding: 12px 8px; font-size: 14px; font-weight: 500;
-      background: #f0f2f5; color: #1c1c1e;
-      border: none; border-radius: 10px; cursor: pointer;
-      transition: all 0.2s; font-family: inherit;
+      background: #f0f2f5; color: #1c1c1e; border: none; border-radius: 10px;
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
     }
     .quick-btn:active { background: #e0e0e5; }
-
     .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .stat-box { background: #f9f9fb; border-radius: 12px; padding: 16px; text-align: center; }
     .stat-value { font-size: 22px; font-weight: 700; color: #1c1c1e; margin-bottom: 4px; }
     .stat-label { font-size: 13px; color: #8e8e93; }
     .stat-value.green { color: #4CAF50; }
-
+    
     .recent-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0; border-bottom: 1px solid #f0f0f0;
-      font-size: 14px; gap: 8px;
+      padding: 12px 8px; border-bottom: 1px solid #f0f0f0;
+      font-size: 14px; gap: 8px; cursor: pointer;
+      border-radius: 8px; transition: background 0.15s;
     }
+    .recent-item:active { background: #f0f0f5; }
     .recent-item:last-child { border-bottom: none; }
-    .recent-text { color: #1c1c1e; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .recent-cat { font-size: 12px; color: #8e8e93; white-space: nowrap; }
+    .recent-text { color: #1c1c1e; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
     .recent-amount { font-weight: 600; color: #1c1c1e; white-space: nowrap; }
     .delete-btn {
       background: transparent; border: none; cursor: pointer;
       font-size: 18px; padding: 4px 8px; margin-left: 4px;
-      opacity: 0.6; transition: opacity 0.2s;
-      font-family: inherit; color: #ff3b30;
+      opacity: 0.6; transition: opacity 0.2s; font-family: inherit; color: #ff3b30;
     }
     .delete-btn:active { opacity: 1; }
-
-    /* ======== АККОРДЕОН КАТЕГОРИЙ ======== */
-    .acc-group {
-      border-radius: 12px;
-      margin-bottom: 8px;
-      overflow: hidden;
-      transition: all 0.2s;
+    
+    /* Модальное окно */
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 1000;
+      display: none; align-items: center; justify-content: center;
+      padding: 20px; animation: fadeIn 0.2s ease;
     }
+    .modal.show { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-content {
+      background: white; border-radius: 16px; width: 100%; max-width: 500px;
+      max-height: 80vh; display: flex; flex-direction: column; overflow: hidden;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+    }
+    .modal-title { font-size: 17px; font-weight: 700; color: #1c1c1e; }
+    .modal-close {
+      background: transparent; border: none; font-size: 20px;
+      cursor: pointer; color: #8e8e93; padding: 4px 8px;
+      border-radius: 8px; font-family: inherit;
+    }
+    .modal-close:active { background: #f0f0f0; }
+    .modal-body { padding: 8px 20px 20px; overflow-y: auto; flex: 1; }
+    
+    /* Аккордеон */
+    .acc-group { border-radius: 12px; margin-bottom: 8px; overflow: hidden; transition: all 0.2s; }
     .acc-group:last-child { margin-bottom: 0; }
-
     .acc-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 16px;
-      cursor: pointer;
-      transition: all 0.15s;
-      user-select: none;
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px; cursor: pointer; transition: all 0.15s; user-select: none;
     }
     .acc-header:active { filter: brightness(0.95); }
-
-    .acc-emoji {
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-    .acc-name {
-      flex: 1;
-      font-size: 15px;
-      font-weight: 600;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .acc-count {
-      font-size: 13px;
-      opacity: 0.7;
-      font-weight: 500;
-      white-space: nowrap;
-    }
-    .acc-arrow {
-      font-size: 12px;
-      opacity: 0.6;
-      transition: transform 0.2s;
-      margin-left: 4px;
-    }
-    .acc-group.open .acc-arrow {
-      transform: rotate(90deg);
-    }
-
-    .acc-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-    }
-    .acc-group.open .acc-body {
-      max-height: 2000px;
-    }
-
+    .acc-emoji { font-size: 20px; flex-shrink: 0; }
+    .acc-name { flex: 1; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .acc-count { font-size: 13px; opacity: 0.7; font-weight: 500; white-space: nowrap; }
+    .acc-arrow { font-size: 12px; opacity: 0.6; transition: transform 0.2s; margin-left: 4px; }
+    .acc-group.open .acc-arrow { transform: rotate(90deg); }
+    .acc-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .acc-group.open .acc-body { max-height: 2000px; }
     .acc-word {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 16px 12px 46px;
-      font-size: 14px;
-      background: rgba(255,255,255,0.5);
-      border-top: 1px solid rgba(0,0,0,0.04);
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px 12px 46px; font-size: 14px;
+      background: rgba(255,255,255,0.5); border-top: 1px solid rgba(0,0,0,0.04);
     }
-    .acc-word-name {
-      flex: 1;
-      color: #1c1c1e;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .acc-word-actions {
-      display: flex;
-      gap: 4px;
-      flex-shrink: 0;
-    }
+    .acc-word-name { flex: 1; color: #1c1c1e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .acc-word-actions { display: flex; gap: 4px; flex-shrink: 0; }
     .acc-word-btn {
-      background: rgba(255,255,255,0.7);
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      padding: 5px 9px;
-      border-radius: 8px;
-      opacity: 0.7;
-      transition: all 0.15s;
-      font-family: inherit;
-      line-height: 1;
+      background: rgba(255,255,255,0.7); border: none; cursor: pointer;
+      font-size: 14px; padding: 5px 9px; border-radius: 8px;
+      opacity: 0.7; transition: all 0.15s; font-family: inherit; line-height: 1;
     }
     .acc-word-btn:active { opacity: 1; transform: scale(0.92); }
     .acc-word-btn.edit { color: #007aff; }
     .acc-word-btn.del { color: #ff3b30; }
-
-    /* Цветовые темы */
+    
     .acc-food      { background: #FFF3E0; color: #E65100; }
     .acc-transport { background: #E3F2FD; color: #0D47A1; }
     .acc-home      { background: #F3E5F5; color: #4A148C; }
@@ -222,58 +149,40 @@
     .acc-shop      { background: #E8F5E9; color: #1B5E20; }
     .acc-comm      { background: #E0F7FA; color: #006064; }
     .acc-default   { background: #ECEFF1; color: #37474F; }
-
+    
     .add-cat-btn {
-      background: #4CAF50;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: inherit;
+      background: #4CAF50; color: white; border: none;
+      padding: 8px 14px; border-radius: 10px; font-size: 13px;
+      font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit;
     }
     .add-cat-btn:active { background: #45a049; transform: scale(0.96); }
-
+    
     .edit-form { background: #f9f9fb; padding: 12px; border-radius: 12px; margin-top: 12px; display: none; }
     .edit-form.show { display: block; }
     .edit-form input { margin-bottom: 8px; padding: 10px; font-size: 15px; }
     .edit-form .btn { padding: 12px; font-size: 15px; }
-
+    
     .help-toggle {
       display: flex; justify-content: space-between; align-items: center;
-      cursor: pointer; padding: 4px 0;
-      color: #4CAF50; font-weight: 600; font-size: 15px;
+      cursor: pointer; padding: 4px 0; color: #4CAF50; font-weight: 600; font-size: 15px;
     }
-    .help-content {
-      display: none; padding-top: 12px;
-      font-size: 14px; color: #3a3a3c; line-height: 1.7;
-    }
+    .help-content { display: none; padding-top: 12px; font-size: 14px; color: #3a3a3c; line-height: 1.7; }
     .help-content.show { display: block; }
     .help-content code { background: #f0f2f5; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
-
+    
     .section-title {
       font-size: 15px; font-weight: 600; color: #8e8e93;
       text-transform: uppercase; letter-spacing: 0.5px;
-      margin-bottom: 12px;
-      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
     }
-
-    .category-prompt {
-      background: #fff3cd; padding: 16px; border-radius: 12px;
-      margin-top: 12px; display: none;
-    }
+    .category-prompt { background: #fff3cd; padding: 16px; border-radius: 12px; margin-top: 12px; display: none; }
     .category-prompt.show { display: block; }
     .category-prompt p { margin: 0 0 12px; font-size: 15px; color: #856404; }
-
     .spinner {
       display: inline-block; width: 16px; height: 16px;
       border: 2px solid rgba(255,255,255,0.3);
       border-top-color: white; border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      vertical-align: middle; margin-right: 8px;
+      animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
@@ -286,7 +195,6 @@
 
     <input type="text" id="text" placeholder="кофе 300 или «на что уходит больше?»" autocomplete="off" autofocus>
     <button class="btn" id="btn" onclick="submitExpense()">Отправить</button>
-
     <div class="result" id="result"></div>
 
     <div class="stats" style="margin-top: 16px;">
@@ -337,7 +245,6 @@
     <div id="catAccordion">
       <div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Загрузка...</div>
     </div>
-    
     <div class="edit-form" id="addCatForm">
       <input type="text" id="newCatKeyword" placeholder="Ключевое слово (например: бассейн)" autocomplete="off">
       <input type="text" id="newCatValue" placeholder="Категория (например: Спорт)" autocomplete="off">
@@ -352,14 +259,20 @@
       <span id="helpArrow">▼</span>
     </div>
     <div class="help-content" id="helpContent">
-      <p><b>Запись расхода:</b></p>
-      <p>Просто напиши: <code>кофе 300</code>, <code>такси 500</code>, <code>продукты 1500</code>.</p>
-      <p><b>ИИ-запросы (любой текст):</b></p>
-      <p>• <code>на что уходит больше всего за месяц?</code></p>
-      <p>• <code>сколько потратил на такси за неделю?</code></p>
-      <p>• <code>сравни этот месяц с прошлым</code></p>
-      <p>• <code>добавь бассейн в спорт</code></p>
-      <p><b>Категории:</b> тапни на категорию — раскроется список слов внутри.</p>
+      <p><b>Запись расхода:</b> <code>кофе 300</code>, <code>такси 500</code>.</p>
+      <p><b>ИИ-запросы:</b> <code>на что уходит больше?</code>, <code>сравни месяцы</code>.</p>
+      <p><b>Категории:</b> тап на категорию — раскрывается список.</p>
+      <p><b>Записи:</b> тап на запись — все траты с этим словом.</p>
+    </div>
+  </div>
+
+  <div class="modal" id="searchModal" onclick="if(event.target===this)closeSearchModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="searchModalTitle">Траты</div>
+        <button class="modal-close" onclick="closeSearchModal()">✕</button>
+      </div>
+      <div class="modal-body" id="searchModalList"></div>
     </div>
   </div>
 
@@ -367,7 +280,7 @@
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwZaU3xfaQqKa1IV6ilnULNIerYocRtEZT7Gb9duB5pgMCFm_OJpBrH8IKL699_byf/exec';
   let pendingCategory = null;
   let allCategories = [];
-  let openGroups = {};  // какие категории раскрыты
+  let openGroups = {};
 
   const CATEGORY_STYLES = {
     'еда':         { emoji: '🍔', cls: 'acc-food' },
@@ -394,13 +307,11 @@
     return new Promise((resolve) => {
       const callbackName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
       const script = document.createElement('script');
-      
       window[callbackName] = function(data) {
         resolve(data);
         delete window[callbackName];
         if (script.parentNode) script.parentNode.removeChild(script);
       };
-      
       const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString() + '&callback=' + callbackName;
       script.src = url;
       script.onerror = function() {
@@ -408,7 +319,6 @@
         if (script.parentNode) script.parentNode.removeChild(script);
       };
       document.body.appendChild(script);
-      
       setTimeout(function() {
         if (window[callbackName]) {
           resolve({ ok: false, error: 'Превышено время ожидания' });
@@ -423,22 +333,17 @@
     const input = document.getElementById('text');
     const text = input.value.trim();
     if (!text) return;
-
     showLoading(true);
     hideResult();
-
     const isSimpleExpense = /^\s*[а-яА-Яa-zA-Z\s]+\s+\d+(?:[.,]\d+)?\s*$/.test(text) 
       || /^\s*\d+(?:[.,]\d+)?\s+[а-яА-Яa-zA-Z\s]+\s*$/.test(text);
-    
     let result;
     if (isSimpleExpense) {
       result = await jsonp({ action: 'add', text: text, who: 'App' });
     } else {
       result = await jsonp({ action: 'ai', text: text });
     }
-    
     showLoading(false);
-
     if (result && result.ok) {
       if (result.type === 'ai') {
         showResult('ok', '🤖 ' + result.message);
@@ -448,8 +353,7 @@
         loadCategories();
         return;
       }
-      const src = result.source === 'ai' ? ' 🤖' : '';
-      showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category + src);
+      showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category);
       input.value = '';
       input.focus();
       loadStats();
@@ -469,9 +373,7 @@
     if (!pendingCategory) return;
     const cat = document.getElementById('catInput').value.trim();
     if (!cat) return;
-
     showLoading(true);
-    
     const result = await jsonp({
       action: 'addCategory',
       keyword: pendingCategory.keyword,
@@ -480,11 +382,9 @@
       text: pendingCategory.text,
       who: 'App'
     });
-    
     showLoading(false);
-
     if (result && result.ok) {
-      showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category + ' (запомнил!)');
+      showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category);
       document.getElementById('text').value = '';
       cancelCategory();
       loadStats();
@@ -507,8 +407,8 @@
   }
 
   async function clearAll() {
-    if (!confirm('Удалить ВСЕ записи из таблицы?\n\nЭто действие нельзя отменить!')) return;
-    if (!confirm('Точно удалить всё? Категории останутся, а расходы исчезнут.')) return;
+    if (!confirm('Удалить ВСЕ записи?\n\nЭто действие нельзя отменить!')) return;
+    if (!confirm('Точно удалить всё?')) return;
     const result = await jsonp({ action: 'clearAll' });
     if (result && result.ok) {
       alert('Удалено записей: ' + result.deleted);
@@ -537,6 +437,7 @@
     }
   }
 
+  // ============ ПОСЛЕДНИЕ ЗАПИСИ ============
   async function loadRecent() {
     const data = await jsonp({ action: 'recent' });
     const list = document.getElementById('recentList');
@@ -545,16 +446,61 @@
       return;
     }
     list.innerHTML = data.items.map(function(item) {
-      return '<div class="recent-item">' +
-        '<div class="recent-text">' + escapeHtml(item.text) + '</div>' +
-        '<div class="recent-cat">' + escapeHtml(item.category) + '</div>' +
+      const title = capitalizeFirst(item.text) || item.category || 'Расход';
+      return '<div class="recent-item" onclick="showExpensesByText(\'' + escapeJs(item.text) + '\')">' +
+        '<div class="recent-text">' + escapeHtml(title) + '</div>' +
         '<div class="recent-amount">' + item.amount.toFixed(0) + ' ₽</div>' +
-        '<button class="delete-btn" onclick="deleteRow(' + item.row + ')">✕</button>' +
+        '<button class="delete-btn" onclick="event.stopPropagation(); deleteRow(' + item.row + ')">✕</button>' +
         '</div>';
     }).join('');
   }
 
-  // ============ АККОРДЕОН КАТЕГОРИЙ ============
+  function capitalizeFirst(str) {
+    if (!str) return '';
+    let cleaned = String(str).replace(/^\s*\d+[\.,]?\d*\s*/, '').trim();
+    if (!cleaned) cleaned = String(str).trim();
+    cleaned = cleaned.replace(/^(вчера|сегодня|позавчера)\s+/i, '');
+    if (!cleaned) cleaned = String(str).trim();
+    return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  }
+
+  // ============ МОДАЛКА ПОИСКА ============
+  async function showExpensesByText(text) {
+    const keyword = String(text).replace(/\d+/g, '').trim().toLowerCase();
+    if (!keyword) return;
+    
+    const modal = document.getElementById('searchModal');
+    const modalList = document.getElementById('searchModalList');
+    const modalTitle = document.getElementById('searchModalTitle');
+    
+    modalTitle.textContent = capitalizeFirst(text) || 'Траты';
+    modalList.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">Загрузка...</div>';
+    modal.classList.add('show');
+    
+    const searchResult = await jsonp({ action: 'searchByText', keyword: keyword });
+    
+    if (searchResult && searchResult.ok && searchResult.items && searchResult.items.length > 0) {
+      let html = searchResult.items.map(function(item) {
+        return '<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f0f0f0; gap:8px;">' +
+          '<div style="flex:1; min-width:0;">' +
+            '<div style="font-size:14px; color:#1c1c1e; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + escapeHtml(item.text) + '</div>' +
+            '<div style="font-size:12px; color:#8e8e93; margin-top:2px;">' + escapeHtml(item.date) + ' · ' + escapeHtml(item.category) + '</div>' +
+          '</div>' +
+          '<div style="font-weight:600; white-space:nowrap;">' + item.amount.toFixed(0) + ' ₽</div>' +
+          '</div>';
+      }).join('');
+      html += '<div style="text-align:right; padding:14px 0 4px; font-weight:700; font-size:16px; border-top:2px solid #f0f0f0; margin-top:8px;">Итого: ' + searchResult.total.toFixed(2) + ' ₽</div>';
+      modalList.innerHTML = html;
+    } else {
+      modalList.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">Ничего не найдено</div>';
+    }
+  }
+
+  function closeSearchModal() {
+    document.getElementById('searchModal').classList.remove('show');
+  }
+
+  // ============ АККОРДЕОН ============
   async function loadCategories() {
     const data = await jsonp({ action: 'getCategories' });
     if (!data || !data.ok) {
@@ -571,42 +517,31 @@
       container.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Нет категорий</div>';
       return;
     }
-    
     const searchQuery = (document.getElementById('catSearch').value || '').toLowerCase().trim();
-    
-    // Группируем по категориям
     const groups = {};
     allCategories.forEach(function(item) {
       const cat = item.category;
       if (!groups[cat]) groups[cat] = [];
       groups[cat].push(item);
     });
-    
-    // Фильтруем по поисковому запросу
     let groupEntries = Object.keys(groups).map(function(cat) {
       return { category: cat, items: groups[cat] };
     });
-    
     if (searchQuery) {
       groupEntries = groupEntries.filter(function(g) {
         if (g.category.toLowerCase().indexOf(searchQuery) !== -1) return true;
         return g.items.some(function(i) { return i.keyword.toLowerCase().indexOf(searchQuery) !== -1; });
       });
     }
-    
     if (groupEntries.length === 0) {
       container.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Ничего не найдено</div>';
       return;
     }
-    
-    // Сортируем: сначала крупные группы
     groupEntries.sort(function(a, b) { return b.items.length - a.items.length; });
     
     container.innerHTML = groupEntries.map(function(g) {
       const style = getCategoryStyle(g.category);
       const isOpen = openGroups[g.category] || (searchQuery && g.items.length > 0);
-      
-      // Если идёт поиск, раскрываем группы с найденными словами
       let visibleItems = g.items;
       if (searchQuery) {
         visibleItems = g.items.filter(function(i) {
@@ -614,17 +549,14 @@
               || g.category.toLowerCase().indexOf(searchQuery) !== -1;
         });
       }
-      
       const wordsHtml = visibleItems.map(function(item) {
         return '<div class="acc-word">' +
           '<div class="acc-word-name">' + escapeHtml(item.keyword) + '</div>' +
           '<div class="acc-word-actions">' +
-          '<button class="acc-word-btn edit" onclick="event.stopPropagation(); editCategory(' + item.row + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')" title="Редактировать">✎</button>' +
-          '<button class="acc-word-btn del" onclick="event.stopPropagation(); deleteCategory(' + item.row + ')" title="Удалить">✕</button>' +
-          '</div>' +
-          '</div>';
+          '<button class="acc-word-btn edit" onclick="event.stopPropagation(); editCategory(' + item.row + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')">✎</button>' +
+          '<button class="acc-word-btn del" onclick="event.stopPropagation(); deleteCategory(' + item.row + ')">✕</button>' +
+          '</div></div>';
       }).join('');
-      
       return '<div class="acc-group ' + style.cls + (isOpen ? ' open' : '') + '" data-cat="' + escapeHtml(g.category) + '">' +
         '<div class="acc-header" onclick="toggleGroup(\'' + escapeJs(g.category) + '\')">' +
           '<span class="acc-emoji">' + style.emoji + '</span>' +
@@ -664,10 +596,7 @@
   async function saveNewCategory() {
     const keyword = document.getElementById('newCatKeyword').value.trim().toLowerCase();
     const category = document.getElementById('newCatValue').value.trim();
-    if (!keyword || !category) {
-      alert('Заполните оба поля');
-      return;
-    }
+    if (!keyword || !category) { alert('Заполните оба поля'); return; }
     const result = await jsonp({ action: 'addCategoryEntry', keyword: keyword, category: category });
     if (result && result.ok) {
       hideAddCategory();
@@ -683,7 +612,6 @@
     const newCategory = prompt('Категория:', category);
     if (newCategory === null) return;
     if (!newKeyword.trim() || !newCategory.trim()) return;
-    
     const result = await jsonp({
       action: 'updateCategory',
       row: row,
