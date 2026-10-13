@@ -79,7 +79,6 @@
     }
     .delete-btn:active { opacity: 1; }
     
-    /* Модальное окно */
     .modal {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 1000;
@@ -110,7 +109,6 @@
     .modal-close:active { background: #f0f0f0; }
     .modal-body { padding: 8px 20px 20px; overflow-y: auto; flex: 1; }
     
-    /* Аккордеон */
     .acc-group { border-radius: 12px; margin-bottom: 8px; overflow: hidden; transition: all 0.2s; }
     .acc-group:last-child { margin-bottom: 0; }
     .acc-header {
@@ -192,11 +190,9 @@
   <div class="card">
     <h1>💸 Расходы</h1>
     <div class="subtitle">Пиши траты или спрашивай ИИ</div>
-
     <input type="text" id="text" placeholder="кофе 300 или «на что уходит больше?»" autocomplete="off" autofocus>
     <button class="btn" id="btn" onclick="submitExpense()">Отправить</button>
     <div class="result" id="result"></div>
-
     <div class="stats" style="margin-top: 16px;">
       <div class="stat-box">
         <div class="stat-value green" id="todayTotal">—</div>
@@ -207,7 +203,6 @@
         <div class="stat-label">За месяц</div>
       </div>
     </div>
-
     <div class="category-prompt" id="catPrompt">
       <p>🤔 Не знаю категорию для «<b id="catKeyword"></b>».</p>
       <input type="text" id="catInput" placeholder="Спорт, Хобби, Дети..." autocomplete="off">
@@ -284,18 +279,16 @@
 
   const CATEGORY_STYLES = {
     'еда':         { emoji: '🍔', cls: 'acc-food' },
-    'жрачка':      { emoji: '🍔', cls: 'acc-food' },
     'продукты':    { emoji: '🍔', cls: 'acc-food' },
     'транспорт':   { emoji: '🚕', cls: 'acc-transport' },
     'жильё':       { emoji: '🏠', cls: 'acc-home' },
-    'жилье':       { emoji: '🏠', cls: 'acc-home' },
     'связь':       { emoji: '📱', cls: 'acc-comm' },
     'здоровье':    { emoji: '🏥', cls: 'acc-health' },
     'покупки':     { emoji: '🛍', cls: 'acc-shop' },
     'развлечения': { emoji: '🎉', cls: 'acc-fun' },
+    'маркетплейсы':{ emoji: '📦', cls: 'acc-shop' },
     'банк':        { emoji: '🏦', cls: 'acc-default' },
-    'другое':      { emoji: '📦', cls: 'acc-default' },
-    'маркетплейсы':{ emoji: '📦', cls: 'acc-shop' }
+    'другое':      { emoji: '📦', cls: 'acc-default' }
   };
 
   function getCategoryStyle(cat) {
@@ -437,7 +430,6 @@
     }
   }
 
-  // ============ ПОСЛЕДНИЕ ЗАПИСИ ============
   async function loadRecent() {
     const data = await jsonp({ action: 'recent' });
     const list = document.getElementById('recentList');
@@ -464,21 +456,16 @@
     return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
   }
 
-  // ============ МОДАЛКА ПОИСКА ============
   async function showExpensesByText(text) {
     const keyword = String(text).replace(/\d+/g, '').trim().toLowerCase();
     if (!keyword) return;
-    
     const modal = document.getElementById('searchModal');
     const modalList = document.getElementById('searchModalList');
     const modalTitle = document.getElementById('searchModalTitle');
-    
     modalTitle.textContent = capitalizeFirst(text) || 'Траты';
     modalList.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">Загрузка...</div>';
     modal.classList.add('show');
-    
     const searchResult = await jsonp({ action: 'searchByText', keyword: keyword });
-    
     if (searchResult && searchResult.ok && searchResult.items && searchResult.items.length > 0) {
       let html = searchResult.items.map(function(item) {
         return '<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f0f0f0; gap:8px;">' +
@@ -500,7 +487,6 @@
     document.getElementById('searchModal').classList.remove('show');
   }
 
-  // ============ АККОРДЕОН ============
   async function loadCategories() {
     const data = await jsonp({ action: 'getCategories' });
     if (!data || !data.ok) {
