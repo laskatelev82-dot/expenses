@@ -326,14 +326,23 @@
   }
 
   async function isSimpleQuery(text) {
-    const lower = text.toLowerCase().trim();
-    if (/^\s*[а-яА-Яa-zA-Z\s]+\s+\d+(?:[.,]\d+)?\s*$/.test(text)) return 'add';
-    if (/^\s*\d+(?:[.,]\d+)?\s+[а-яА-Яa-zA-Z\s]+\s*$/.test(text)) return 'add';
-    if (/^(сколько|итого)\s+(потратил|за)/.test(lower)) return 'stats';
-    if (/^(покажи|список|какие)\s+(категори|слова)/.test(lower)) return 'getCategories';
-    if (/^(помощь|help|команды)$/.test(lower)) return 'help';
-    return null;
-  }
+  const lower = text.toLowerCase().trim();
+  
+  // Простая запись расхода: слово + число (с любым регистром)
+  if (/^\s*[а-яёa-z\s]+\s+\d+(?:[.,]\d+)?\s*$/iu.test(text)) return 'add';
+  if (/^\s*\d+(?:[.,]\d+)?\s+[а-яёa-z\s]+\s*$/iu.test(text)) return 'add';
+  
+  // Статистика
+  if (/^(сколько|итого)\s+(потратил|за)/i.test(lower)) return 'stats';
+  
+  // Категории
+  if (/^(покажи|список|какие)\s+(категори|слова)/i.test(lower)) return 'getCategories';
+  
+  // Помощь
+  if (/^(помощь|help|команды)$/i.test(lower)) return 'help';
+  
+  return null;
+}
 
   async function submitExpense() {
     const input = document.getElementById('text');
