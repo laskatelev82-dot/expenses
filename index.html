@@ -16,38 +16,18 @@
   <title>Расходы</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
-    html, body {
-      overscroll-behavior: none;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-
+    html, body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      margin: 0;
-      padding: 16px;
+      margin: 0; padding: 16px;
       padding-top: calc(16px + env(safe-area-inset-top));
       padding-bottom: calc(16px + env(safe-area-inset-bottom));
-      background: #f0f2f5;
-      min-height: 100vh;
-      color: #1c1c1e;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+      background: #f0f2f5; min-height: 100vh; color: #1c1c1e;
+      max-width: 600px; margin-left: auto; margin-right: auto;
     }
-
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
+    .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     h1 { font-size: 24px; margin: 0 0 4px; font-weight: 700; }
     .subtitle { color: #8e8e93; font-size: 14px; margin-bottom: 20px; }
-
     input[type=text] {
       width: 100%; padding: 16px; font-size: 17px;
       border: 2px solid #e5e5ea; border-radius: 12px;
@@ -56,7 +36,6 @@
       -webkit-user-select: text; user-select: text;
     }
     input[type=text]:focus { outline: none; border-color: #4CAF50; background: white; }
-
     .btn {
       width: 100%; padding: 16px; font-size: 17px; font-weight: 600;
       background: #4CAF50; color: white;
@@ -67,91 +46,52 @@
     .btn:disabled { background: #ccc; cursor: not-allowed; }
     .btn-secondary { background: #f0f2f5; color: #1c1c1e; margin-top: 8px; }
     .btn-secondary:active { background: #e5e5ea; }
-    .btn-danger { background: #ff3b30; color: white; }
-    .btn-danger:active { background: #d70015; }
-
-    .result {
-      margin-top: 12px; padding: 14px; border-radius: 12px;
-      font-size: 15px; display: none;
-      animation: slideIn 0.3s ease;
-    }
+    .result { margin-top: 12px; padding: 14px; border-radius: 12px; font-size: 15px; display: none; animation: slideIn 0.3s ease; }
     .ok { background: #d4edda; color: #155724; display: block; }
     .err { background: #f8d7da; color: #721c24; display: block; }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .quick-buttons {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 8px; margin-top: 8px;
-    }
-    .quick-btn {
-      padding: 12px 8px; font-size: 14px; font-weight: 500;
-      background: #f0f2f5; color: #1c1c1e;
-      border: none; border-radius: 10px; cursor: pointer;
-      transition: all 0.2s; font-family: inherit;
-    }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .quick-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .quick-btn { padding: 12px 8px; font-size: 14px; font-weight: 500; background: #f0f2f5; color: #1c1c1e; border: none; border-radius: 10px; cursor: pointer; transition: all 0.2s; font-family: inherit; }
     .quick-btn:active { background: #e0e0e5; }
-
     .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .stat-box { background: #f9f9fb; border-radius: 12px; padding: 16px; text-align: center; }
     .stat-value { font-size: 22px; font-weight: 700; color: #1c1c1e; margin-bottom: 4px; }
     .stat-label { font-size: 13px; color: #8e8e93; }
     .stat-value.green { color: #4CAF50; }
-
-    .recent-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0; border-bottom: 1px solid #f0f0f0;
-      font-size: 14px; gap: 8px;
-    }
+    .recent-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; gap: 8px; }
     .recent-item:last-child { border-bottom: none; }
     .recent-text { color: #1c1c1e; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .recent-cat { font-size: 12px; color: #8e8e93; white-space: nowrap; }
     .recent-amount { font-weight: 600; color: #1c1c1e; white-space: nowrap; }
-    .delete-btn {
-      background: transparent; border: none; cursor: pointer;
-      font-size: 18px; padding: 4px 8px; margin-left: 4px;
-      opacity: 0.6; transition: opacity 0.2s;
-      font-family: inherit; color: #ff3b30;
-    }
+    .delete-btn { background: transparent; border: none; cursor: pointer; font-size: 18px; padding: 4px 8px; margin-left: 4px; opacity: 0.6; transition: opacity 0.2s; font-family: inherit; color: #ff3b30; }
     .delete-btn:active { opacity: 1; }
-
-    .help-toggle {
-      display: flex; justify-content: space-between; align-items: center;
-      cursor: pointer; padding: 4px 0;
-      color: #4CAF50; font-weight: 600; font-size: 15px;
-    }
-    .help-content {
-      display: none; padding-top: 12px;
-      font-size: 14px; color: #3a3a3c; line-height: 1.7;
-    }
+    .help-toggle { display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 4px 0; color: #4CAF50; font-weight: 600; font-size: 15px; }
+    .help-content { display: none; padding-top: 12px; font-size: 14px; color: #3a3a3c; line-height: 1.7; }
     .help-content.show { display: block; }
     .help-content code { background: #f0f2f5; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
-
-    .section-title {
-      font-size: 15px; font-weight: 600; color: #8e8e93;
-      text-transform: uppercase; letter-spacing: 0.5px;
-      margin-bottom: 12px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-
-    .category-prompt {
-      background: #fff3cd; padding: 16px; border-radius: 12px;
-      margin-top: 12px; display: none;
-    }
+    .section-title { font-size: 15px; font-weight: 600; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .category-prompt { background: #fff3cd; padding: 16px; border-radius: 12px; margin-top: 12px; display: none; }
     .category-prompt.show { display: block; }
     .category-prompt p { margin: 0 0 12px; font-size: 15px; color: #856404; }
-
-    .spinner {
-      display: inline-block; width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: white; border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      vertical-align: middle; margin-right: 8px;
-    }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .cat-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px;
+    }
+    .cat-item:last-child { border-bottom: none; }
+    .cat-keyword { flex: 1; font-weight: 500; color: #1c1c1e; }
+    .cat-arrow { color: #8e8e93; font-size: 14px; }
+    .cat-value { font-weight: 600; color: #4CAF50; }
+    .cat-actions { display: flex; gap: 4px; }
+    .cat-edit { background: transparent; border: none; cursor: pointer; font-size: 16px; padding: 4px 8px; opacity: 0.6; color: #007aff; }
+    .cat-edit:active { opacity: 1; }
+    
+    .edit-form { background: #f9f9fb; padding: 12px; border-radius: 12px; margin-top: 8px; display: none; }
+    .edit-form.show { display: block; }
+    .edit-form input { margin-bottom: 8px; padding: 10px; font-size: 15px; }
+    .edit-form .btn { padding: 12px; font-size: 15px; }
   </style>
 </head>
 <body>
@@ -162,7 +102,6 @@
 
     <input type="text" id="text" placeholder="кофе 300" autocomplete="off" autofocus>
     <button class="btn" id="btn" onclick="submitExpense()">Записать</button>
-
     <div class="result" id="result"></div>
 
     <div class="stats" style="margin-top: 16px;">
@@ -195,12 +134,26 @@
   </div>
 
   <div class="card">
-    <div class="section-title">
-      <span>🕐 Последние записи</span>
-      <button class="delete-btn" style="font-size:13px;" onclick="clearAll()">Очистить всё</button>
-    </div>
+    <div class="section-title">🕐 Последние записи</div>
     <div id="recentList">
       <div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">
+      <span>🏷 Категории</span>
+      <button class="cat-edit" style="font-size:13px;" onclick="showAddCategory()">+ Добавить</button>
+    </div>
+    <div id="catList">
+      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div>
+    </div>
+    
+    <div class="edit-form" id="addCatForm">
+      <input type="text" id="newCatKeyword" placeholder="Ключевое слово (например: бассейн)" autocomplete="off">
+      <input type="text" id="newCatValue" placeholder="Категория (например: Спорт)" autocomplete="off">
+      <button class="btn" onclick="saveNewCategory()">Сохранить</button>
+      <button class="btn btn-secondary" onclick="hideAddCategory()">Отменить</button>
     </div>
   </div>
 
@@ -213,8 +166,8 @@
       <p><b>Как записать расход:</b></p>
       <p>Просто напиши в поле: <code>кофе 300</code>, <code>такси 500</code>, <code>продукты 1500</code>.</p>
       <p><b>Категории:</b> бот сам определит категорию по ключевому слову. Если не знает — попросит ввести и запомнит.</p>
-      <p><b>Быстрые кнопки:</b> можно тапнуть на частые траты — они подставятся в поле.</p>
-      <p><b>Удаление:</b> рядом с каждой записью есть кнопка ✕ для удаления. Кнопка «Очистить всё» удаляет всю историю.</p>
+      <p><b>Управление категориями:</b> в блоке «Категории» можно добавлять, редактировать и удалять ключевые слова.</p>
+      <p><b>Удаление записей:</b> в списке расходов нажмите ✕ рядом с записью.</p>
     </div>
   </div>
 
@@ -226,13 +179,11 @@
     return new Promise((resolve) => {
       const callbackName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
       const script = document.createElement('script');
-      
       window[callbackName] = function(data) {
         resolve(data);
         delete window[callbackName];
         if (script.parentNode) script.parentNode.removeChild(script);
       };
-      
       const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString() + '&callback=' + callbackName;
       script.src = url;
       script.onerror = function() {
@@ -240,7 +191,6 @@
         if (script.parentNode) script.parentNode.removeChild(script);
       };
       document.body.appendChild(script);
-      
       setTimeout(function() {
         if (window[callbackName]) {
           resolve({ ok: false, error: 'Превышено время ожидания' });
@@ -255,13 +205,10 @@
     const input = document.getElementById('text');
     const text = input.value.trim();
     if (!text) return;
-
     showLoading(true);
     hideResult();
-
     const result = await jsonp({ action: 'add', text: text, who: 'App' });
     showLoading(false);
-
     if (result && result.ok) {
       showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category);
       input.value = '';
@@ -283,9 +230,7 @@
     if (!pendingCategory) return;
     const cat = document.getElementById('catInput').value.trim();
     if (!cat) return;
-
     showLoading(true);
-    
     const result = await jsonp({
       action: 'addCategory',
       keyword: pendingCategory.keyword,
@@ -294,15 +239,14 @@
       text: pendingCategory.text,
       who: 'App'
     });
-    
     showLoading(false);
-
     if (result && result.ok) {
       showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category + ' (запомнил!)');
       document.getElementById('text').value = '';
       cancelCategory();
       loadStats();
       loadRecent();
+      loadCategories();
     } else {
       showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка'));
     }
@@ -310,27 +254,12 @@
 
   async function deleteRow(rowIndex) {
     if (!confirm('Удалить эту запись?')) return;
-    
     const result = await jsonp({ action: 'delete', row: rowIndex });
     if (result && result.ok) {
       loadStats();
       loadRecent();
     } else {
       alert('Ошибка удаления: ' + (result && result.error ? result.error : 'неизвестно'));
-    }
-  }
-
-  async function clearAll() {
-    if (!confirm('Удалить ВСЕ записи из таблицы?\n\nЭто действие нельзя отменить!')) return;
-    if (!confirm('Точно удалить всё? Категории останутся, а расходы исчезнут.')) return;
-    
-    const result = await jsonp({ action: 'clearAll' });
-    if (result && result.ok) {
-      alert('Удалено записей: ' + result.deleted);
-      loadStats();
-      loadRecent();
-    } else {
-      alert('Ошибка: ' + (result && result.error ? result.error : 'неизвестно'));
     }
   }
 
@@ -367,6 +296,88 @@
         '<button class="delete-btn" onclick="deleteRow(' + item.row + ')">✕</button>' +
         '</div>';
     }).join('');
+  }
+
+  // ============ КАТЕГОРИИ ============
+  async function loadCategories() {
+    const data = await jsonp({ action: 'getCategories' });
+    const list = document.getElementById('catList');
+    if (!data || !data.ok || !data.items || data.items.length === 0) {
+      list.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Нет категорий</div>';
+      return;
+    }
+    list.innerHTML = data.items.map(function(item) {
+      return '<div class="cat-item">' +
+        '<div class="cat-keyword">' + escapeHtml(item.keyword) + '</div>' +
+        '<div class="cat-arrow">→</div>' +
+        '<div class="cat-value">' + escapeHtml(item.category) + '</div>' +
+        '<div class="cat-actions">' +
+        '<button class="cat-edit" onclick="editCategory(' + item.row + ', \'' + escapeJs(item.keyword) + '\', \'' + escapeJs(item.category) + '\')">✎</button>' +
+        '<button class="delete-btn" onclick="deleteCategory(' + item.row + ')">✕</button>' +
+        '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function escapeJs(str) {
+    return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  }
+
+  function showAddCategory() {
+    document.getElementById('addCatForm').classList.add('show');
+    document.getElementById('newCatKeyword').value = '';
+    document.getElementById('newCatValue').value = '';
+    document.getElementById('newCatKeyword').focus();
+  }
+
+  function hideAddCategory() {
+    document.getElementById('addCatForm').classList.remove('show');
+  }
+
+  async function saveNewCategory() {
+    const keyword = document.getElementById('newCatKeyword').value.trim().toLowerCase();
+    const category = document.getElementById('newCatValue').value.trim();
+    if (!keyword || !category) {
+      alert('Заполните оба поля');
+      return;
+    }
+    const result = await jsonp({ action: 'addCategoryEntry', keyword: keyword, category: category });
+    if (result && result.ok) {
+      hideAddCategory();
+      loadCategories();
+    } else {
+      alert('Ошибка: ' + (result && result.error ? result.error : 'неизвестно'));
+    }
+  }
+
+  async function editCategory(row, keyword, category) {
+    const newKeyword = prompt('Ключевое слово:', keyword);
+    if (newKeyword === null) return;
+    const newCategory = prompt('Категория:', category);
+    if (newCategory === null) return;
+    if (!newKeyword.trim() || !newCategory.trim()) return;
+    
+    const result = await jsonp({
+      action: 'updateCategory',
+      row: row,
+      keyword: newKeyword.trim().toLowerCase(),
+      category: newCategory.trim()
+    });
+    if (result && result.ok) {
+      loadCategories();
+    } else {
+      alert('Ошибка: ' + (result && result.error ? result.error : 'неизвестно'));
+    }
+  }
+
+  async function deleteCategory(row) {
+    if (!confirm('Удалить это ключевое слово?')) return;
+    const result = await jsonp({ action: 'deleteCategory', row: row });
+    if (result && result.ok) {
+      loadCategories();
+    } else {
+      alert('Ошибка: ' + (result && result.error ? result.error : 'неизвестно'));
+    }
   }
 
   function escapeHtml(str) {
@@ -412,6 +423,7 @@
 
   loadStats();
   loadRecent();
+  loadCategories();
 </script>
 </body>
 </html>
