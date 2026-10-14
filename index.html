@@ -97,7 +97,6 @@
     .modal-close { background: transparent; border: none; font-size: 20px; cursor: pointer; color: #8e8e93; padding: 4px 8px; border-radius: 8px; font-family: inherit; }
     .modal-close:active { background: #f0f0f0; }
     .modal-body { padding: 8px 20px 20px; overflow-y: auto; flex: 1; }
-    
     .acc-group { border-radius: 12px; margin-bottom: 8px; overflow: hidden; transition: all 0.2s; }
     .acc-group:last-child { margin-bottom: 0; }
     .acc-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; user-select: none; }
@@ -111,7 +110,6 @@
     .acc-group.open .acc-arrow { transform: rotate(90deg); }
     .acc-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
     .acc-group.open .acc-body { max-height: 3000px; }
-    
     .acc-word { display: flex; align-items: center; gap: 8px; padding: 12px 16px 12px 46px; font-size: 14px; background: rgba(255,255,255,0.5); border-top: 1px solid rgba(0,0,0,0.04); }
     .acc-word-name { flex: 1; color: #1c1c1e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .acc-word-total { font-size: 13px; font-weight: 700; color: #1c1c1e; margin-right: 8px; white-space: nowrap; }
@@ -187,6 +185,18 @@
     </div>
   </div>
 
+  <div class="card" id="importSection">
+    <div class="section-title">
+      <span>📸 Импорт из Mir Pay</span>
+    </div>
+    <p style="font-size:14px; color:#3a3a3c; line-height:1.6; margin:0 0 12px;">
+      Сделайте скриншот истории операций в Mir Pay и загрузите сюда — приложение распознает операции и добавит только новые.
+    </p>
+    <input type="file" id="screenshotInput" accept="image/*" style="display:none;" onchange="handleScreenshotUpload(event)">
+    <button class="btn" onclick="document.getElementById('screenshotInput').click()">📁 Выбрать скриншот</button>
+    <div id="importResult" style="margin-top:12px;"></div>
+  </div>
+
   <div class="card" id="catSection">
     <div class="section-title">
       <span id="catSectionTitle">🏷 Категории</span>
@@ -211,13 +221,14 @@
     </div>
     <div class="help-content" id="helpContent">
       <p><b>📝 Запись:</b> <code>кофе 300</code> — мгновенно.</p>
+      <p><b>📸 Импорт Mir Pay:</b> скриншот истории → кнопка «Выбрать скриншот».</p>
       <p><b>🤖 ИИ-помощник Плюша:</b> начни запрос с её имени:</p>
       <p>• <code>Плюша, создай категорию Кружки</code></p>
       <p>• <code>Плюша, добавь бассейн в Кружки</code></p>
       <p>• <code>Плюша, на что уходит больше за месяц?</code></p>
       <p>• <code>Плюша, что приготовить из курицы?</code></p>
       <p>• <code>Плюша, как сэкономить?</code></p>
-      <p><b>🏷 Категории:</b> тап — раскрыть. Суммы за всё время — и в категориях, и в словах.</p>
+      <p><b>🏷 Категории:</b> тап — раскрыть. Суммы за всё время.</p>
     </div>
   </div>
 
@@ -285,6 +296,59 @@
         }
       }, 60000);
     });
+  }
+
+  // ============ ИМПОРТ ИЗ СКРИНШОТА ============
+  async function handleScreenshotUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const resultDiv = document.getElementById('importResult');
+    resultDiv.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">📤 Загружаю и распознаю...</div>';
+    
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64 = e.target.result.split(',')[1];
+      
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'importImage', image: base64 }),
+          headers: { 'Content-Type': 'text/plain' }
+        });
+        
+        const result = await response.json();
+        
+        if (result.ok) {
+          let html = '<div style="background:#d4edda; color:#155724; padding:12px; border-radius:10px; margin-bottom:8px;">';
+          html += '<b>✅ Добавлено: ' + result.added + '</b><br>';
+          html += '<span style="font-size:13px;">Пропущено дублей: ' + result.skipped + '</span>';
+          html += '</div>';
+          
+          if (result.items && result.items.length > 0) {
+            html += '<div style="background:#f9f9fb; border-radius:10px; padding:12px; font-size:13px;">';
+            for (const item of result.items) {
+              html += '<div style="padding:6px 0; border-bottom:1px solid #eee;">';
+              html += '<b>' + escapeHtml(item.text) + '</b> — ' + escapeHtml(item.category);
+              html += '</div>';
+            }
+            html += '</div>';
+          }
+          
+          resultDiv.innerHTML = html;
+          loadStats();
+          loadRecent();
+          loadCategories();
+        } else {
+          resultDiv.innerHTML = '<div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:10px;">❌ ' + escapeHtml(result.error || 'Ошибка') + '</div>';
+        }
+      } catch (err) {
+        resultDiv.innerHTML = '<div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:10px;">❌ ' + escapeHtml(err.message) + '</div>';
+      }
+      
+      event.target.value = '';
+    };
+    reader.readAsDataURL(file);
   }
 
   function isAICall(text) {
@@ -375,7 +439,7 @@
       return;
     } else if (simpleType === 'help') {
       showLoading(false);
-      showResult('ok', '💡 Примеры:\n• кофе 300 — запись\n• Плюша, создай категорию Кружки\n• Плюша, что приготовить?\n• Плюша, на что уходит больше?');
+      showResult('ok', '💡 Примеры:\n• кофе 300 — запись\n• 📸 Импорт Mir Pay — загрузить скриншот\n• Плюша, что приготовить?\n• Плюша, на что уходит больше?');
       return;
     } else {
       showLoading(false);
@@ -595,7 +659,6 @@
               || g.category.toLowerCase().indexOf(searchQuery) !== -1;
         });
       }
-      
       const wordsHtml = visibleItems.map(function(item) {
         const wordTotal = item.total > 0 ? item.total.toFixed(0) + ' ₽' : '';
         const wordTotalClass = item.total > 0 ? 'acc-word-total' : 'acc-word-total acc-word-total-empty';
@@ -607,10 +670,8 @@
           '<button class="acc-word-btn del" onclick="event.stopPropagation(); deleteCategory(' + (item.row || 0) + ')">✕</button>' +
           '</div></div>';
       }).join('');
-      
       const totalStr = g.total > 0 ? g.total.toFixed(0) + ' ₽' : '—';
       const totalClass = g.total > 0 ? 'acc-total' : 'acc-total acc-total-empty';
-      
       return '<div class="acc-group ' + style.cls + (isOpen ? ' open' : '') + '" data-cat="' + escapeHtml(g.category) + '">' +
         '<div class="acc-header" onclick="toggleGroup(\'' + escapeJs(g.category) + '\')">' +
           '<span class="acc-emoji">' + style.emoji + '</span>' +
