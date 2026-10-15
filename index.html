@@ -190,7 +190,7 @@
       <span>📸 Импорт из Mir Pay</span>
     </div>
     <p style="font-size:14px; color:#3a3a3c; line-height:1.6; margin:0 0 12px;">
-      Сделайте скриншот истории операций в Mir Pay и загрузите сюда — приложение распознает операции и добавит только новые.
+      Сделайте скриншот истории операций в Mir Pay и загрузите сюда — распознаю операции и добавлю только новые.
     </p>
     <input type="file" id="screenshotInput" accept="image/*" style="display:none;" onchange="handleScreenshotUpload(event)">
     <button class="btn" onclick="document.getElementById('screenshotInput').click()">📁 Выбрать скриншот</button>
@@ -221,14 +221,13 @@
     </div>
     <div class="help-content" id="helpContent">
       <p><b>📝 Запись:</b> <code>кофе 300</code> — мгновенно.</p>
-      <p><b>📸 Импорт Mir Pay:</b> скриншот истории → кнопка «Выбрать скриншот».</p>
+      <p><b>📸 Импорт Mir Pay:</b> скриншот истории → «Выбрать скриншот». OCR работает локально.</p>
       <p><b>🤖 ИИ-помощник Плюша:</b> начни запрос с её имени:</p>
       <p>• <code>Плюша, создай категорию Кружки</code></p>
       <p>• <code>Плюша, добавь бассейн в Кружки</code></p>
       <p>• <code>Плюша, на что уходит больше за месяц?</code></p>
       <p>• <code>Плюша, что приготовить из курицы?</code></p>
       <p>• <code>Плюша, как сэкономить?</code></p>
-      <p><b>🏷 Категории:</b> тап — раскрыть. Суммы за всё время.</p>
     </div>
   </div>
 
@@ -242,12 +241,16 @@
     </div>
   </div>
 
+<!-- Tesseract.js — OCR в браузере -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
 <script>
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwZaU3xfaQqKa1IV6ilnULNIerYocRtEZT7Gb9duB5pgMCFm_OJpBrH8IKL699_byf/exec';
   let pendingCategory = null;
   let allCategories = [];
   let openGroups = {};
   let categoryTotals = {};
+  let tesseractWorker = null;
 
   const CATEGORY_STYLES = {
     'еда':         { emoji: '🍔', cls: 'acc-food' },
@@ -298,57 +301,70 @@
     });
   }
 
-  // ============ ИМПОРТ ИЗ СКРИНШОТА ============
+  // ============ ИМПОРТ ИЗ СКРИНШОТА (Tesseract.js) ============
   async function handleScreenshotUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
     
     const resultDiv = document.getElementById('importResult');
-    resultDiv.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">📤 Загружаю и распознаю...</div>';
+    resultDiv.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">🔍 Распознаю текст (первый раз ~30 сек, потом быстрее)...</div>';
     
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-      const base64 = e.target.result.split(',')[1];
-      
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify({ action: 'importImage', image: base64 }),
-          headers: { 'Content-Type': 'text/plain' }
-        });
-        
-        const result = await response.json();
-        
-        if (result.ok) {
-          let html = '<div style="background:#d4edda; color:#155724; padding:12px; border-radius:10px; margin-bottom:8px;">';
-          html += '<b>✅ Добавлено: ' + result.added + '</b><br>';
-          html += '<span style="font-size:13px;">Пропущено дублей: ' + result.skipped + '</span>';
-          html += '</div>';
-          
-          if (result.items && result.items.length > 0) {
-            html += '<div style="background:#f9f9fb; border-radius:10px; padding:12px; font-size:13px;">';
-            for (const item of result.items) {
-              html += '<div style="padding:6px 0; border-bottom:1px solid #eee;">';
-              html += '<b>' + escapeHtml(item.text) + '</b> — ' + escapeHtml(item.category);
-              html += '</div>';
+    try {
+      // Создаём/переиспользуем Tesseract worker
+      if (!tesseractWorker) {
+        tesseractWorker = await Tesseract.createWorker('rus+eng', 1, {
+          logger: function(m) {
+            if (m.status === 'recognizing text') {
+              const pct = Math.round(m.progress * 100);
+              resultDiv.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">🔍 Распознаю: ' + pct + '%</div>';
+            } else if (m.status === 'loading tesseract core') {
+              resultDiv.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">📦 Загружаю OCR-модель (первый раз ~10 МБ)...</div>';
             }
-            html += '</div>';
           }
-          
-          resultDiv.innerHTML = html;
-          loadStats();
-          loadRecent();
-          loadCategories();
-        } else {
-          resultDiv.innerHTML = '<div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:10px;">❌ ' + escapeHtml(result.error || 'Ошибка') + '</div>';
-        }
-      } catch (err) {
-        resultDiv.innerHTML = '<div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:10px;">❌ ' + escapeHtml(err.message) + '</div>';
+        });
       }
       
-      event.target.value = '';
-    };
-    reader.readAsDataURL(file);
+      const { data: { text } } = await tesseractWorker.recognize(file);
+      
+      resultDiv.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">📤 Отправляю текст в таблицу...</div>';
+      
+      // Отправляем распознанный текст на сервер
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'importText', text: text }),
+        headers: { 'Content-Type': 'text/plain' }
+      });
+      
+      const result = await response.json();
+      
+      if (result.ok) {
+        let html = '<div style="background:#d4edda; color:#155724; padding:12px; border-radius:10px; margin-bottom:8px;">';
+        html += '<b>✅ Добавлено: ' + result.added + '</b><br>';
+        html += '<span style="font-size:13px;">Пропущено дублей: ' + result.skipped + '</span>';
+        html += '</div>';
+        
+        if (result.items && result.items.length > 0) {
+          html += '<div style="background:#f9f9fb; border-radius:10px; padding:12px; font-size:13px;">';
+          for (const item of result.items) {
+            html += '<div style="padding:6px 0; border-bottom:1px solid #eee;">';
+            html += '<b>' + escapeHtml(item.text) + '</b> — ' + escapeHtml(item.category);
+            html += '</div>';
+          }
+          html += '</div>';
+        }
+        
+        resultDiv.innerHTML = html;
+        loadStats();
+        loadRecent();
+        loadCategories();
+      } else {
+        resultDiv.innerHTML = '<div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:10px;">❌ ' + escapeHtml(result.error || 'Ошибка') + '<br><br>Распознанный текст:<br><pre style="font-size:11px; white-space:pre-wrap; max-height:200px; overflow:auto;">' + escapeHtml(result.rawText || '') + '</pre></div>';
+      }
+    } catch (err) {
+      resultDiv.innerHTML = '<div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:10px;">❌ ' + escapeHtml(err.message) + '</div>';
+    }
+    
+    event.target.value = '';
   }
 
   function isAICall(text) {
