@@ -177,14 +177,15 @@
   </div>
 
   <div class="card">
-    <div class="section-title">
-      <span>🕐 Последние записи</span>
-      <button class="delete-btn" style="font-size:13px;" onclick="clearAll()">Очистить всё</button>
-    </div>
-    <div id="recentList">
-      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div>
-    </div>
+  <div class="section-title">
+    <span>🕐 Последние записи</span>
+    <button class="delete-btn" style="font-size:13px;" onclick="clearAll()">Очистить всё</button>
   </div>
+  <div id="recentList">
+    <div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div>
+  </div>
+  <button id="toggleRecentBtn" class="btn btn-secondary" style="display:none; margin-top:10px; font-size:14px; padding:10px;" onclick="toggleRecent()">Показать все</button>
+</div>
 
   <div class="card" id="importSection">
     <div class="section-title">
@@ -568,14 +569,35 @@
     }
   }
 
+    let recentExpanded = false;
+  let recentData = [];
+
   async function loadRecent() {
     const data = await jsonp({ action: 'recent' });
     const list = document.getElementById('recentList');
+    const toggleBtn = document.getElementById('toggleRecentBtn');
+    
     if (!data || !data.ok || !data.items || data.items.length === 0) {
       list.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Пока нет записей</div>';
+      if (toggleBtn) toggleBtn.style.display = 'none';
       return;
     }
-    list.innerHTML = data.items.map(function(item) {
+    
+    recentData = data.items;
+    
+    if (toggleBtn) {
+      if (recentData.length > 5) {
+        toggleBtn.style.display = 'block';
+        toggleBtn.textContent = recentExpanded ? 'Свернуть' : 'Показать все (' + recentData.length + ')';
+      } else {
+        toggleBtn.style.display = 'none';
+      }
+    }
+    
+    const count = recentExpanded ? recentData.length : Math.min(5, recentData.length);
+    const visible = recentData.slice(0, count);
+    
+    list.innerHTML = visible.map(function(item) {
       const title = capitalizeFirst(item.text) || item.category || 'Расход';
       return '<div class="recent-item" onclick="showExpensesByText(\'' + escapeJs(item.text) + '\')">' +
         '<div class="recent-text">' + escapeHtml(title) + '</div>' +
@@ -583,6 +605,11 @@
         '<button class="delete-btn" onclick="event.stopPropagation(); deleteRow(' + item.row + ')">✕</button>' +
         '</div>';
     }).join('');
+  }
+
+  function toggleRecent() {
+    recentExpanded = !recentExpanded;
+    loadRecent();
   }
 
   function capitalizeFirst(str) {
