@@ -78,6 +78,14 @@
       opacity: 0.6; transition: opacity 0.2s; font-family: inherit; color: #ff3b30;
     }
     .delete-btn:active { opacity: 1; }
+    .toggle-recent-btn {
+      display: none; width: 100%; padding: 10px;
+      margin-top: 10px; font-size: 14px; font-weight: 500;
+      background: #f0f2f5; color: #1c1c1e;
+      border: none; border-radius: 10px; cursor: pointer;
+      font-family: inherit; transition: all 0.2s;
+    }
+    .toggle-recent-btn:active { background: #e0e0e5; }
     .modal {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); z-index: 1000;
@@ -177,15 +185,15 @@
   </div>
 
   <div class="card">
-  <div class="section-title">
-    <span>🕐 Последние записи</span>
-    <button class="delete-btn" style="font-size:13px;" onclick="clearAll()">Очистить всё</button>
+    <div class="section-title">
+      <span>🕐 Последние записи</span>
+      <button class="delete-btn" style="font-size:13px;" onclick="clearAll()">Очистить всё</button>
+    </div>
+    <div id="recentList">
+      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div>
+    </div>
+    <button id="toggleRecentBtn" class="toggle-recent-btn" onclick="toggleRecent()">Показать все</button>
   </div>
-  <div id="recentList">
-    <div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div>
-  </div>
-  <button id="toggleRecentBtn" class="btn btn-secondary" style="display:none; margin-top:10px; font-size:14px; padding:10px;" onclick="toggleRecent()">Показать все</button>
-</div>
 
   <div class="card" id="importSection">
     <div class="section-title">
@@ -243,7 +251,6 @@
     </div>
   </div>
 
-<!-- Tesseract.js — OCR в браузере -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <script>
@@ -253,6 +260,8 @@
   let openGroups = {};
   let categoryTotals = {};
   let tesseractWorker = null;
+  let recentExpanded = false;
+  let recentData = [];
 
   const CATEGORY_STYLES = {
     'еда':         { emoji: '🍔', cls: 'acc-food' },
@@ -362,7 +371,6 @@
           html += '</div>';
         }
         
-        // Показ распознанного текста
         html += '<details style="margin-top:8px;"><summary style="cursor:pointer; color:#8e8e93; font-size:12px; padding:6px 0;">📄 Показать распознанный текст (' + (result.rawText || '').length + ' символов)</summary>';
         html += '<div class="raw-text">' + escapeHtml(result.rawText || 'Пусто') + '</div>';
         html += '</details>';
@@ -569,9 +577,7 @@
     }
   }
 
-    let recentExpanded = false;
-  let recentData = [];
-
+  // ============ ПОСЛЕДНИЕ ЗАПИСИ ============
   async function loadRecent() {
     const data = await jsonp({ action: 'recent' });
     const list = document.getElementById('recentList');
