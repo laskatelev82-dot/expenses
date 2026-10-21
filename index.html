@@ -33,15 +33,33 @@
     }
     input[type=text]:focus { outline: none; border-color: #4CAF50; background: white; }
     .search-input { padding: 10px 14px; font-size: 15px; margin-bottom: 12px; }
+    
     .btn {
       width: 100%; padding: 16px; font-size: 17px; font-weight: 600;
       background: #4CAF50; color: white; border: none; border-radius: 12px; cursor: pointer;
       transition: all 0.2s; font-family: inherit;
+      margin-bottom: 8px;
     }
     .btn:active { background: #45a049; transform: scale(0.98); }
     .btn:disabled { background: #ccc; cursor: not-allowed; }
+    
+    .btn-voice {
+      background: #007aff;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-voice:active { background: #0056cc; }
+    .btn-voice.listening {
+      background: #ff3b30;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(255, 59, 48, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+    }
     .btn-secondary { background: #f0f2f5; color: #1c1c1e; margin-top: 8px; }
     .btn-secondary:active { background: #e5e5ea; }
+    
     .result {
       margin-top: 12px; padding: 14px; border-radius: 12px;
       font-size: 15px; display: none; animation: slideIn 0.3s ease;
@@ -50,20 +68,13 @@
     .ok { background: #d4edda; color: #155724; display: block; }
     .err { background: #f8d7da; color: #721c24; display: block; }
     @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-    .quick-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-    .quick-btn {
-      padding: 12px 8px; font-size: 14px; font-weight: 500;
-      background: #f0f2f5; color: #1c1c1e; border: none; border-radius: 10px;
-      cursor: pointer; transition: all 0.2s; font-family: inherit;
-    }
-    .quick-btn:active { background: #e0e0e5; }
+    
     .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .stat-box { background: #f9f9fb; border-radius: 12px; padding: 16px; text-align: center; }
     .stat-value { font-size: 22px; font-weight: 700; color: #1c1c1e; margin-bottom: 4px; }
     .stat-label { font-size: 13px; color: #8e8e93; }
     .stat-value.green { color: #4CAF50; }
     
-    /* ======== ПОСЛЕДНИЕ ЗАПИСИ (ГРУППИРОВКА ПО ДАТАМ) ======== */
     .date-group { margin-bottom: 8px; border-radius: 12px; overflow: hidden; background: #f9f9fb; }
     .date-header {
       display: flex; align-items: center; gap: 10px;
@@ -160,16 +171,18 @@
     .category-prompt p { margin: 0 0 12px; font-size: 15px; color: #856404; }
     .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .raw-text { background: #f9f9fb; padding: 10px; border-radius: 8px; font-size: 11px; white-space: pre-wrap; max-height: 300px; overflow: auto; margin-top: 8px; font-family: monospace; }
   </style>
 </head>
 <body>
 
   <div class="card">
     <h1>💸 Расходы</h1>
-    <div class="subtitle">Запись или «Плюша, ...» для ИИ</div>
-    <input type="text" id="text" placeholder="кофе 300 или «Плюша, что приготовить?»" autocomplete="off" autofocus>
+    <div class="subtitle">Пиши траты или спрашивай ИИ</div>
+    <input type="text" id="text" placeholder="кофе 300 или «на что уходит больше?»" autocomplete="off" autofocus>
+    
+    <button class="btn btn-voice" id="voiceBtn" onclick="startVoice()">🎤 Сказать</button>
     <button class="btn" id="btn" onclick="submitExpense()">Отправить</button>
+    
     <div class="result" id="result"></div>
     <div class="stats" style="margin-top: 16px;">
       <div class="stat-box"><div class="stat-value green" id="todayTotal">—</div><div class="stat-label">Сегодня</div></div>
@@ -184,16 +197,6 @@
   </div>
 
   <div class="card">
-    <div class="section-title">⚡ Быстрые траты</div>
-    <div class="quick-buttons">
-      <button class="quick-btn" onclick="quickAdd('кофе 200')">☕ Кофе 200</button>
-      <button class="quick-btn" onclick="quickAdd('обед 500')">🍽 Обед 500</button>
-      <button class="quick-btn" onclick="quickAdd('такси 300')">🚕 Такси 300</button>
-      <button class="quick-btn" onclick="quickAdd('продукты 1000')">🛒 Продукты 1000</button>
-    </div>
-  </div>
-
-  <div class="card">
     <div class="section-title">
       <span>🕐 Последние записи</span>
       <button class="delete-btn" style="font-size:13px;" onclick="clearAll()">Очистить всё</button>
@@ -201,18 +204,6 @@
     <div id="recentList">
       <div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div>
     </div>
-  </div>
-
-  <div class="card" id="importSection">
-    <div class="section-title">
-      <span>📸 Импорт из Mir Pay</span>
-    </div>
-    <p style="font-size:14px; color:#3a3a3c; line-height:1.6; margin:0 0 12px;">
-      Сделайте скриншот истории операций в Mir Pay и загрузите сюда — распознаю операции и добавлю только новые.
-    </p>
-    <input type="file" id="screenshotInput" accept="image/*" style="display:none;" onchange="handleScreenshotUpload(event)">
-    <button class="btn" onclick="document.getElementById('screenshotInput').click()">📁 Выбрать скриншот</button>
-    <div id="importResult" style="margin-top:12px;"></div>
   </div>
 
   <div class="card" id="catSection">
@@ -239,12 +230,12 @@
     </div>
     <div class="help-content" id="helpContent">
       <p><b>📝 Запись:</b> <code>кофе 300</code> — мгновенно.</p>
-      <p><b>📸 Импорт Mir Pay:</b> скриншот истории → «Выбрать скриншот». OCR работает локально.</p>
-      <p><b>🤖 ИИ-помощник Плюша:</b> начни запрос с её имени:</p>
-      <p>• <code>Плюша, создай категорию Кружки</code></p>
-      <p>• <code>Плюша, добавь бассейн в Кружки</code></p>
-      <p>• <code>Плюша, на что уходит больше за месяц?</code></p>
-      <p>• <code>Плюша, что приготовить из курицы?</code></p>
+      <p><b>🎤 Голос:</b> нажми «Сказать» и произнеси трату или вопрос.</p>
+      <p><b>🤖 ИИ-помощник:</b> просто задай вопрос — если это не запись траты, ИИ сам ответит:</p>
+      <p>• <code>создай категорию Кружки</code></p>
+      <p>• <code>на что уходит больше за месяц?</code></p>
+      <p>• <code>что приготовить из курицы?</code></p>
+      <p>• <code>как сэкономить?</code></p>
     </div>
   </div>
 
@@ -258,16 +249,15 @@
     </div>
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
 <script>
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwZaU3xfaQqKa1IV6ilnULNIerYocRtEZT7Gb9duB5pgMCFm_OJpBrH8IKL699_byf/exec';
   let pendingCategory = null;
   let allCategories = [];
   let openGroups = {};
   let categoryTotals = {};
-  let tesseractWorker = null;
-  let expandedDates = {}; // Для группировки по датам
+  let expandedDates = {};
+  let recognition = null;
+  let isListening = false;
 
   const CATEGORY_STYLES = {
     'еда':         { emoji: '🍔', cls: 'acc-food' },
@@ -292,122 +282,70 @@
     return CATEGORY_STYLES[key] || { emoji: '🏷', cls: 'acc-default' };
   }
 
-  function jsonp(params) {
-    return new Promise((resolve) => {
-      const callbackName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-      const script = document.createElement('script');
-      window[callbackName] = function(data) {
-        resolve(data);
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-      };
-      const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString() + '&callback=' + callbackName;
-      script.src = url;
-      script.onerror = function() {
-        resolve({ ok: false, error: 'Ошибка соединения' });
-        if (script.parentNode) script.parentNode.removeChild(script);
-      };
-      document.body.appendChild(script);
-      setTimeout(function() {
-        if (window[callbackName]) {
-          resolve({ ok: false, error: 'Превышено время ожидания' });
-          delete window[callbackName];
-          if (script.parentNode) script.parentNode.removeChild(script);
-        }
-      }, 60000);
-    });
-  }
+  // ============ ГОЛОСОВОЙ ВВОД ============
+  function startVoice() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Голосовой ввод не поддерживается вашим браузером. Используйте Chrome или Safari.');
+      return;
+    }
 
-  // ============ ИМПОРТ ИЗ СКРИНШОТА ============
-  async function handleScreenshotUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    const resultDiv = document.getElementById('importResult');
-    resultDiv.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">🔍 Распознаю текст...</div>';
-    
-    try {
-      if (!tesseractWorker) {
-        tesseractWorker = await Tesseract.createWorker('rus+eng', 1, {
-          logger: function(m) {
-            if (m.status === 'recognizing text') {
-              const pct = Math.round(m.progress * 100);
-              resultDiv.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">🔍 Распознаю: ' + pct + '%</div>';
-            } else if (m.status === 'loading tesseract core') {
-              resultDiv.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">📦 Загружаю OCR-модель (первый раз ~10 МБ)...</div>';
-            }
-          }
-        });
-      }
+    if (isListening) {
+      if (recognition) recognition.stop();
+      return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.lang = 'ru-RU';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    const voiceBtn = document.getElementById('voiceBtn');
+    const textInput = document.getElementById('text');
+
+    voiceBtn.classList.add('listening');
+    voiceBtn.innerHTML = '🔴 Слушаю...';
+    isListening = true;
+
+    recognition.onresult = function(event) {
+      const transcript = event.results[0][0].transcript;
+      textInput.value = transcript;
+      voiceBtn.classList.remove('listening');
+      voiceBtn.innerHTML = '🎤 Сказать';
+      isListening = false;
       
-      const { data: { text } } = await tesseractWorker.recognize(file);
+      // Автоматически отправляем
+      submitExpense();
+    };
+
+    recognition.onerror = function(event) {
+      console.error('Speech error:', event.error);
+      voiceBtn.classList.remove('listening');
+      voiceBtn.innerHTML = '🎤 Сказать';
+      isListening = false;
       
-      resultDiv.innerHTML = '<div style="text-align:center; padding:16px; color:#8e8e93;">📤 Отправляю в таблицу...</div>';
-      
-      const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'importText', text: text }),
-        headers: { 'Content-Type': 'text/plain' }
-      });
-      
-      const result = await response.json();
-      
-      let html = '';
-      
-      if (result.ok) {
-        if (result.added > 0) {
-          html += '<div style="background:#d4edda; color:#155724; padding:12px; border-radius:10px; margin-bottom:8px;">';
-        } else {
-          html += '<div style="background:#fff3cd; color:#856404; padding:12px; border-radius:10px; margin-bottom:8px;">';
-        }
-        html += '<b>✅ Добавлено: ' + result.added + '</b><br>';
-        html += '<span style="font-size:13px;">Пропущено дублей: ' + result.skipped + '</span>';
-        if (result.added === 0 && result.skipped === 0) {
-          html += '<br><span style="font-size:12px;">Операции не найдены в тексте.</span>';
-        }
-        html += '</div>';
-        
-        if (result.items && result.items.length > 0) {
-          html += '<div style="background:#f9f9fb; border-radius:10px; padding:12px; font-size:13px;">';
-          for (const item of result.items) {
-            html += '<div style="padding:6px 0; border-bottom:1px solid #eee;">';
-            html += '<b>' + escapeHtml(item.text) + '</b> — ' + escapeHtml(item.category);
-            html += '</div>';
-          }
-          html += '</div>';
-        }
-        
-        html += '<details style="margin-top:8px;"><summary style="cursor:pointer; color:#8e8e93; font-size:12px; padding:6px 0;">📄 Показать распознанный текст (' + (result.rawText || '').length + ' символов)</summary>';
-        html += '<div class="raw-text">' + escapeHtml(result.rawText || 'Пусто') + '</div>';
-        html += '</details>';
-        
-        resultDiv.innerHTML = html;
-        loadStats();
-        loadRecent();
-        loadCategories();
+      if (event.error === 'no-speech') {
+        showResult('err', '❌ Ничего не услышал. Попробуй ещё раз.');
+      } else if (event.error === 'not-allowed') {
+        showResult('err', '❌ Нет разрешения на микрофон. Разреши в настройках браузера.');
       } else {
-        html = '<div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:10px;">❌ ' + escapeHtml(result.error || 'Ошибка') + '</div>';
-        resultDiv.innerHTML = html;
+        showResult('err', '❌ Ошибка: ' + event.error);
       }
-    } catch (err) {
-      resultDiv.innerHTML = '<div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:10px;">❌ ' + escapeHtml(err.message) + '</div>';
-    }
-    
-    event.target.value = '';
+    };
+
+    recognition.onend = function() {
+      voiceBtn.classList.remove('listening');
+      voiceBtn.innerHTML = '🎤 Сказать';
+      isListening = false;
+    };
+
+    recognition.start();
   }
 
-  function isAICall(text) {
-    const lower = text.toLowerCase().trim();
-    const names = ['плюша', 'плюш', 'плюшка'];
-    for (const name of names) {
-      if (lower.startsWith(name) || lower.startsWith(name + ',') || lower.startsWith(name + ' ')) return true;
-    }
-    return false;
-  }
-
+  // ============ ЛОГИКА ============
   function stripAIName(text) {
     const lower = text.toLowerCase().trim();
-    const names = ['плюша', 'плюш', 'плюшка'];
+    const names = ['плюша,', 'плюш,', 'плюшка,', 'плюша ', 'плюш ', 'плюшка ', 'плюша', 'плюш', 'плюшка'];
     for (const name of names) {
       if (lower.startsWith(name)) {
         return text.substring(name.length).replace(/^[\s,.:;!?-]+/, '').trim();
@@ -416,57 +354,46 @@
     return text;
   }
 
-  function isSimpleQuery(text) {
+  function classifyQuery(text) {
     const lower = text.toLowerCase().trim();
+    
     if (/^\s*[а-яёa-z\s]+\s+\d+(?:[.,]\d+)?\s*$/iu.test(text)) return 'add';
     if (/^\s*\d+(?:[.,]\d+)?\s+[а-яёa-z\s]+\s*$/iu.test(text)) return 'add';
+    
     if (/^(сколько|итого)\s+(потратил|за)/i.test(lower)) return 'stats';
     if (/^(покажи|список|какие)\s+(категори|слова)/i.test(lower)) return 'getCategories';
     if (/^(помощь|help|команды)$/i.test(lower)) return 'help';
-    return null;
+    
+    return 'ai';
   }
 
   async function submitExpense() {
     const input = document.getElementById('text');
-    const text = input.value.trim();
+    let text = input.value.trim();
     if (!text) return;
-    showLoading(true);
-    hideResult();
     
-    if (isAICall(text)) {
-      const question = stripAIName(text);
-      if (!question) {
-        showLoading(false);
-        showResult('ok', '👋 Привет! Я Плюша. Спроси: «Плюша, на что уходит больше?»');
-        return;
-      }
-      const result = await jsonp({ action: 'ai', text: question });
-      showLoading(false);
-      if (result && result.ok && result.type === 'ai') {
-        showResult('ok', '🤖 ' + result.message);
-        input.value = '';
-        loadStats();
-        loadRecent();
-        loadCategories();
-      } else {
-        showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка ИИ'));
-      }
+    text = stripAIName(text);
+    if (!text) {
+      showResult('ok', '👋 Привет! Напиши вопрос или запиши трату.');
       return;
     }
     
-    const simpleType = isSimpleQuery(text);
+    showLoading(true);
+    hideResult();
+    
+    const type = classifyQuery(text);
     let result;
     
-    if (simpleType === 'add') {
+    if (type === 'add') {
       result = await jsonp({ action: 'add', text: text, who: 'App' });
-    } else if (simpleType === 'stats') {
+    } else if (type === 'stats') {
       result = await jsonp({ action: 'stats' });
       showLoading(false);
       if (result && result.ok) {
         showResult('ok', '💰 Сегодня: ' + result.today.toFixed(0) + ' ₽\n📅 За месяц: ' + result.month.toFixed(0) + ' ₽');
       }
       return;
-    } else if (simpleType === 'getCategories') {
+    } else if (type === 'getCategories') {
       result = await jsonp({ action: 'getCategories' });
       showLoading(false);
       if (result && result.ok) {
@@ -482,19 +409,23 @@
         showResult('ok', msg);
       }
       return;
-    } else if (simpleType === 'help') {
+    } else if (type === 'help') {
       showLoading(false);
-      showResult('ok', '💡 Примеры:\n• кофе 300 — запись\n• 📸 Импорт Mir Pay — загрузить скриншот\n• Плюша, что приготовить?\n• Плюша, на что уходит больше?');
+      showResult('ok', '💡 Примеры:\n• кофе 300 — запись\n• 🎤 «Сказать» — голосовой ввод\n• на что уходит больше? — ИИ-анализ\n• что приготовить из курицы? — рецепт от ИИ');
       return;
-    } else {
-      showLoading(false);
-      showResult('err', '🤔 Не понял. Для записи: «кофе 300». Для ИИ: «Плюша, ...»');
-      return;
+    } else if (type === 'ai') {
+      result = await jsonp({ action: 'ai', text: text });
     }
     
     showLoading(false);
     if (result && result.ok) {
-      if (result.needCategory) {
+      if (result.type === 'ai') {
+        showResult('ok', '🤖 ' + result.message);
+        input.value = '';
+        loadStats();
+        loadRecent();
+        loadCategories();
+      } else if (result.needCategory) {
         pendingCategory = { text: text, amount: result.amount, keyword: result.keyword };
         document.getElementById('catKeyword').textContent = result.keyword;
         document.getElementById('catPrompt').classList.add('show');
@@ -569,11 +500,6 @@
     document.getElementById('catPrompt').classList.remove('show');
   }
 
-  function quickAdd(text) {
-    document.getElementById('text').value = text;
-    submitExpense();
-  }
-
   async function loadStats() {
     const data = await jsonp({ action: 'stats' });
     if (data && data.ok) {
@@ -582,7 +508,6 @@
     }
   }
 
-  // ============ ПОСЛЕДНИЕ ЗАПИСИ (ГРУППИРОВКА) ============
   async function loadRecent() {
     const data = await jsonp({ action: 'recent' });
     const list = document.getElementById('recentList');
@@ -692,7 +617,6 @@
     document.getElementById('searchModal').classList.remove('show');
   }
 
-  // ============ КАТЕГОРИИ ============
   async function loadCategories() {
     const data = await jsonp({ action: 'getCategoriesWithTotals' });
     if (!data || !data.ok) {
