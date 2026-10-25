@@ -218,6 +218,16 @@
     </div>
   </div>
 
+  <!-- НОВЫЙ БЛОК: ТРАТЫ ПО МЕСЯЦАМ -->
+  <div class="card" id="monthlySection">
+    <div class="section-title">
+      <span>📊 Траты по месяцам</span>
+    </div>
+    <div id="monthlyList">
+      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Загрузка...</div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="help-toggle" onclick="toggleHelp()">
       <span>❓ Как пользоваться</span>
@@ -229,7 +239,6 @@
       <p>• <code>создай категорию Кружки</code></p>
       <p>• <code>на что уходит больше за месяц?</code></p>
       <p>• <code>что приготовить из курицы?</code></p>
-      <p>• <code>как сэкономить?</code></p>
     </div>
   </div>
 
@@ -250,6 +259,7 @@
   let openGroups = {};
   let categoryTotals = {};
   let expandedDates = {};
+  let expandedMonths = {};
 
   const CATEGORY_STYLES = {
     'еда':         { emoji: '🍔', cls: 'acc-food' },
@@ -382,6 +392,7 @@
         loadStats();
         loadRecent();
         loadCategories();
+        loadMonthly();
       } else if (result.needCategory) {
         pendingCategory = { text: text, amount: result.amount, keyword: result.keyword };
         document.getElementById('catKeyword').textContent = result.keyword;
@@ -394,6 +405,7 @@
         input.focus();
         loadStats();
         loadRecent();
+        loadMonthly();
       }
     } else {
       showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка'));
@@ -421,6 +433,7 @@
       loadStats();
       loadRecent();
       loadCategories();
+      loadMonthly();
     } else {
       showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка'));
     }
@@ -433,6 +446,7 @@
       loadStats();
       loadRecent();
       loadCategories();
+      loadMonthly();
     } else {
       alert('Ошибка удаления: ' + (result && result.error ? result.error : 'неизвестно'));
     }
@@ -447,6 +461,7 @@
       loadStats();
       loadRecent();
       loadCategories();
+      loadMonthly();
     } else {
       alert('Ошибка: ' + (result && result.error ? result.error : 'неизвестно'));
     }
@@ -537,6 +552,47 @@
   function toggleDateGroup(dateKey) {
     expandedDates[dateKey] = expandedDates[dateKey] === false ? true : false;
     loadRecent();
+  }
+
+  // ============ ТРАТЫ ПО МЕСЯЦАМ (11-10) ============
+  async function loadMonthly() {
+    const data = await jsonp({ action: 'getMonthlyTotals' });
+    const list = document.getElementById('monthlyList');
+    
+    if (!data || !data.ok || !data.periods || data.periods.length === 0) {
+      list.innerHTML = '<div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Пока нет данных</div>';
+      return;
+    }
+    
+    const html = data.periods.map(function(p) {
+      const isExpanded = expandedMonths[p.key] === true;
+      
+      const catList = Object.entries(p.categories)
+        .sort(function(a, b) { return b[1] - a[1]; })
+        .map(function(entry) {
+          return '<div style="display:flex; justify-content:space-between; padding:6px 16px 6px 46px; font-size:13px; border-top:1px solid rgba(0,0,0,0.04);">' +
+            '<span>' + escapeHtml(entry[0]) + '</span>' +
+            '<span style="font-weight:600;">' + entry[1].toFixed(0) + ' ₽</span>' +
+            '</div>';
+        }).join('');
+      
+      return '<div class="date-group">' +
+        '<div class="date-header" onclick="toggleMonth(\'' + p.key + '\')">' +
+          '<span class="date-name">' + p.label + '</span>' +
+          '<span class="date-sum">' + p.total.toFixed(0) + ' ₽</span>' +
+          '<span class="date-count">' + p.count + '</span>' +
+          '<span class="date-arrow">' + (isExpanded ? '▼' : '▶') + '</span>' +
+        '</div>' +
+        (isExpanded ? '<div class="date-items">' + catList + '</div>' : '') +
+        '</div>';
+    }).join('');
+    
+    list.innerHTML = html;
+  }
+
+  function toggleMonth(key) {
+    expandedMonths[key] = expandedMonths[key] !== true;
+    loadMonthly();
   }
 
   function capitalizeFirst(str) {
@@ -780,6 +836,7 @@
   loadStats();
   loadRecent();
   loadCategories();
+  loadMonthly();
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
