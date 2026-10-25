@@ -33,33 +33,15 @@
     }
     input[type=text]:focus { outline: none; border-color: #4CAF50; background: white; }
     .search-input { padding: 10px 14px; font-size: 15px; margin-bottom: 12px; }
-    
     .btn {
       width: 100%; padding: 16px; font-size: 17px; font-weight: 600;
       background: #4CAF50; color: white; border: none; border-radius: 12px; cursor: pointer;
       transition: all 0.2s; font-family: inherit;
-      margin-bottom: 8px;
     }
     .btn:active { background: #45a049; transform: scale(0.98); }
     .btn:disabled { background: #ccc; cursor: not-allowed; }
-    
-    .btn-voice {
-      background: #007aff;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .btn-voice:active { background: #0056cc; }
-    .btn-voice.listening {
-      background: #ff3b30;
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); }
-      70% { box-shadow: 0 0 0 15px rgba(255, 59, 48, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
-    }
     .btn-secondary { background: #f0f2f5; color: #1c1c1e; margin-top: 8px; }
     .btn-secondary:active { background: #e5e5ea; }
-    
     .result {
       margin-top: 12px; padding: 14px; border-radius: 12px;
       font-size: 15px; display: none; animation: slideIn 0.3s ease;
@@ -68,7 +50,13 @@
     .ok { background: #d4edda; color: #155724; display: block; }
     .err { background: #f8d7da; color: #721c24; display: block; }
     @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-    
+    .quick-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .quick-btn {
+      padding: 12px 8px; font-size: 14px; font-weight: 500;
+      background: #f0f2f5; color: #1c1c1e; border: none; border-radius: 10px;
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
+    }
+    .quick-btn:active { background: #e0e0e5; }
     .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .stat-box { background: #f9f9fb; border-radius: 12px; padding: 16px; text-align: center; }
     .stat-value { font-size: 22px; font-weight: 700; color: #1c1c1e; margin-bottom: 4px; }
@@ -179,10 +167,7 @@
     <h1>💸 Расходы</h1>
     <div class="subtitle">Пиши траты или спрашивай ИИ</div>
     <input type="text" id="text" placeholder="кофе 300 или «на что уходит больше?»" autocomplete="off" autofocus>
-    
-    <button class="btn btn-voice" id="voiceBtn" onclick="startVoice()">🎤 Сказать</button>
     <button class="btn" id="btn" onclick="submitExpense()">Отправить</button>
-    
     <div class="result" id="result"></div>
     <div class="stats" style="margin-top: 16px;">
       <div class="stat-box"><div class="stat-value green" id="todayTotal">—</div><div class="stat-label">Сегодня</div></div>
@@ -193,6 +178,16 @@
       <input type="text" id="catInput" placeholder="Спорт, Хобби, Дети..." autocomplete="off">
       <button class="btn" onclick="submitCategory()">Сохранить категорию</button>
       <button class="btn btn-secondary" onclick="cancelCategory()">Отменить</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">⚡ Быстрые траты</div>
+    <div class="quick-buttons">
+      <button class="quick-btn" onclick="quickAdd('кофе 200')">☕ Кофе 200</button>
+      <button class="quick-btn" onclick="quickAdd('обед 500')">🍽 Обед 500</button>
+      <button class="quick-btn" onclick="quickAdd('такси 300')">🚕 Такси 300</button>
+      <button class="quick-btn" onclick="quickAdd('продукты 1000')">🛒 Продукты 1000</button>
     </div>
   </div>
 
@@ -230,7 +225,6 @@
     </div>
     <div class="help-content" id="helpContent">
       <p><b>📝 Запись:</b> <code>кофе 300</code> — мгновенно.</p>
-      <p><b>🎤 Голос:</b> нажми «Сказать» и произнеси трату или вопрос.</p>
       <p><b>🤖 ИИ-помощник:</b> просто задай вопрос — если это не запись траты, ИИ сам ответит:</p>
       <p>• <code>создай категорию Кружки</code></p>
       <p>• <code>на что уходит больше за месяц?</code></p>
@@ -256,8 +250,6 @@
   let openGroups = {};
   let categoryTotals = {};
   let expandedDates = {};
-  let recognition = null;
-  let isListening = false;
 
   const CATEGORY_STYLES = {
     'еда':         { emoji: '🍔', cls: 'acc-food' },
@@ -282,67 +274,32 @@
     return CATEGORY_STYLES[key] || { emoji: '🏷', cls: 'acc-default' };
   }
 
-  // ============ ГОЛОСОВОЙ ВВОД ============
-  function startVoice() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert('Голосовой ввод не поддерживается вашим браузером. Используйте Chrome или Safari.');
-      return;
-    }
-
-    if (isListening) {
-      if (recognition) recognition.stop();
-      return;
-    }
-
-    recognition = new SpeechRecognition();
-    recognition.lang = 'ru-RU';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    const voiceBtn = document.getElementById('voiceBtn');
-    const textInput = document.getElementById('text');
-
-    voiceBtn.classList.add('listening');
-    voiceBtn.innerHTML = '🔴 Слушаю...';
-    isListening = true;
-
-    recognition.onresult = function(event) {
-      const transcript = event.results[0][0].transcript;
-      textInput.value = transcript;
-      voiceBtn.classList.remove('listening');
-      voiceBtn.innerHTML = '🎤 Сказать';
-      isListening = false;
-      
-      // Автоматически отправляем
-      submitExpense();
-    };
-
-    recognition.onerror = function(event) {
-      console.error('Speech error:', event.error);
-      voiceBtn.classList.remove('listening');
-      voiceBtn.innerHTML = '🎤 Сказать';
-      isListening = false;
-      
-      if (event.error === 'no-speech') {
-        showResult('err', '❌ Ничего не услышал. Попробуй ещё раз.');
-      } else if (event.error === 'not-allowed') {
-        showResult('err', '❌ Нет разрешения на микрофон. Разреши в настройках браузера.');
-      } else {
-        showResult('err', '❌ Ошибка: ' + event.error);
-      }
-    };
-
-    recognition.onend = function() {
-      voiceBtn.classList.remove('listening');
-      voiceBtn.innerHTML = '🎤 Сказать';
-      isListening = false;
-    };
-
-    recognition.start();
+  function jsonp(params) {
+    return new Promise((resolve) => {
+      const callbackName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      const script = document.createElement('script');
+      window[callbackName] = function(data) {
+        resolve(data);
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+      };
+      const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString() + '&callback=' + callbackName;
+      script.src = url;
+      script.onerror = function() {
+        resolve({ ok: false, error: 'Ошибка соединения' });
+        if (script.parentNode) script.parentNode.removeChild(script);
+      };
+      document.body.appendChild(script);
+      setTimeout(function() {
+        if (window[callbackName]) {
+          resolve({ ok: false, error: 'Превышено время ожидания' });
+          delete window[callbackName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+      }, 60000);
+    });
   }
 
-  // ============ ЛОГИКА ============
   function stripAIName(text) {
     const lower = text.toLowerCase().trim();
     const names = ['плюша,', 'плюш,', 'плюшка,', 'плюша ', 'плюш ', 'плюшка ', 'плюша', 'плюш', 'плюшка'];
@@ -411,7 +368,7 @@
       return;
     } else if (type === 'help') {
       showLoading(false);
-      showResult('ok', '💡 Примеры:\n• кофе 300 — запись\n• 🎤 «Сказать» — голосовой ввод\n• на что уходит больше? — ИИ-анализ\n• что приготовить из курицы? — рецепт от ИИ');
+      showResult('ok', '💡 Примеры:\n• кофе 300 — запись\n• на что уходит больше? — ИИ-анализ\n• что приготовить из курицы? — рецепт от ИИ');
       return;
     } else if (type === 'ai') {
       result = await jsonp({ action: 'ai', text: text });
@@ -498,6 +455,11 @@
   function cancelCategory() {
     pendingCategory = null;
     document.getElementById('catPrompt').classList.remove('show');
+  }
+
+  function quickAdd(text) {
+    document.getElementById('text').value = text;
+    submitExpense();
   }
 
   async function loadStats() {
