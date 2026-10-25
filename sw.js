@@ -1,4 +1,4 @@
-const CACHE_NAME = 'expenses-v16';
+const CACHE_NAME = 'expenses-v17';
 const urlsToCache = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', function(event) {
