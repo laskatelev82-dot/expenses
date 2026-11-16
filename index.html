@@ -39,8 +39,7 @@ body {
 .nav-item {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  cursor: pointer; transition: all 0.15s;
-  color: #8e8e93; font-size: 11px; font-weight: 500;
+  cursor: pointer; color: #8e8e93; font-size: 11px; font-weight: 500;
 }
 .nav-item:active { background: #f5f5f5; }
 .nav-item.active { color: #4CAF50; }
@@ -50,7 +49,7 @@ body {
 .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 h2 { font-size: 20px; margin: 0 0 4px; font-weight: 700; }
 .subtitle { color: #8e8e93; font-size: 14px; margin-bottom: 20px; }
-input[type=text], input[type=date], input[type=number], select {
+input[type=text], input[type=date], select {
   width: 100%; padding: 12px; font-size: 15px;
   border: 1.5px solid #e5e5ea; border-radius: 10px;
   background: #f9f9fb; font-family: inherit;
@@ -65,12 +64,7 @@ input:focus, select:focus { outline: none; border-color: #4CAF50; background: wh
 .btn:active { background: #45a049; }
 .btn:disabled { background: #ccc; }
 .btn-secondary { background: #f0f2f5; color: #1c1c1e; margin-top: 8px; }
-.btn-row { display: flex; gap: 8px; }
-.btn-row .btn { flex: 1; }
-.result {
-  margin-top: 12px; padding: 14px; border-radius: 12px;
-  font-size: 15px; display: none; white-space: pre-wrap;
-}
+.result { margin-top: 12px; padding: 14px; border-radius: 12px; font-size: 15px; display: none; white-space: pre-wrap; }
 .ok { background: #d4edda; color: #155724; display: block; }
 .err { background: #f8d7da; color: #721c24; display: block; }
 .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -146,18 +140,19 @@ input:focus, select:focus { outline: none; border-color: #4CAF50; background: wh
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ===== ГРАФИКИ ===== */
-.chart-field { margin-bottom: 12px; }
-.chart-field label { display: block; font-size: 12px; color: #8e8e93; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
-.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.quick-periods { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-.quick-periods button {
-  padding: 8px 12px; font-size: 13px; border-radius: 20px;
+/* ===== ЧИПЫ ===== */
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.chip {
+  padding: 8px 14px; font-size: 13px; font-weight: 500; border-radius: 20px;
   border: 1.5px solid #e5e5ea; background: #f9f9fb; color: #1c1c1e;
-  cursor: pointer; font-family: inherit; font-weight: 500;
+  cursor: pointer; font-family: inherit; transition: all 0.15s;
 }
-.quick-periods button:active { background: #e5e5ea; }
-.quick-periods button.active { background: #4CAF50; color: white; border-color: #4CAF50; }
+.chip:active { transform: scale(0.95); }
+.chip.active { background: #4CAF50; color: white; border-color: #4CAF50; }
+.chip.small { padding: 6px 10px; font-size: 12px; }
+.chip-group-label { font-size: 12px; color: #8e8e93; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+
+/* ===== ГРАФИКИ ===== */
 .chart-wrapper { position: relative; height: 300px; width: 100%; margin-top: 12px; }
 .chart-toolbar { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
 .chart-toolbar button {
@@ -223,48 +218,47 @@ input:focus, select:focus { outline: none; border-color: #4CAF50; background: wh
   <div class="card">
     <div class="section-title"><span>📈 Построить график</span></div>
 
-    <div class="chart-field">
-      <label>Тип графика</label>
-      <select id="chartType">
-        <option value="line">Линия (динамика)</option>
-        <option value="bar">Столбцы</option>
-      </select>
+    <div class="chip-group-label">Тип графика</div>
+    <div class="chip-row" id="typeChips">
+      <button class="chip active" data-v="line" onclick="setType('line', this)">📈 Линия</button>
+      <button class="chip" data-v="bar" onclick="setType('bar', this)">📊 Столбцы</button>
     </div>
 
-    <div class="chart-field">
-      <label>Группировка</label>
-      <select id="chartGroup">
-        <option value="day">По дням</option>
-        <option value="week" selected>По неделям (Пн–Вс)</option>
-        <option value="period">По периодам 11–10</option>
-      </select>
+    <div class="chip-group-label">Группировка</div>
+    <div class="chip-row" id="groupChips">
+      <button class="chip" data-v="day" onclick="setGroup('day', this)">По дням</button>
+      <button class="chip active" data-v="week" onclick="setGroup('week', this)">По неделям</button>
+      <button class="chip" data-v="period" onclick="setGroup('period', this)">11–10</button>
     </div>
 
-    <div class="chart-field">
-      <label>Категория</label>
-      <select id="chartCategory"><option value="__all">Все категории</option></select>
+    <div class="chip-group-label">Период</div>
+    <div class="chip-row" id="periodChips">
+      <button class="chip active" data-p="thisWeek" onclick="setPeriod('thisWeek', this)">Эта неделя</button>
+      <button class="chip" data-p="lastWeek" onclick="setPeriod('lastWeek', this)">Прошлая</button>
+      <button class="chip" data-p="prevWeek" onclick="setPeriod('prevWeek', this)">Позапрошлая</button>
+      <button class="chip" data-p="thisMonth" onclick="setPeriod('thisMonth', this)">Текущий месяц</button>
+      <button class="chip" data-p="lastMonth" onclick="setPeriod('lastMonth', this)">Прошлый месяц</button>
+      <button class="chip" data-p="custom" onclick="setPeriod('custom', this)">Свой период</button>
     </div>
 
-    <div class="chart-field">
-      <label>Быстрый период</label>
-      <div class="quick-periods" id="quickPeriods">
-        <button data-p="week" onclick="setQuickPeriod('week', this)">Текущая неделя</button>
-        <button data-p="month" onclick="setQuickPeriod('month', this)">Текущий месяц</button>
-        <button data-p="30" onclick="setQuickPeriod('30', this)">30 дней</button>
-        <button data-p="90" onclick="setQuickPeriod('90', this)">90 дней</button>
-        <button data-p="custom" onclick="setQuickPeriod('custom', this)">Свой период</button>
-      </div>
-    </div>
-
-    <div class="chart-row" id="dateRangeBlock" style="display:none;">
-      <div class="chart-field">
-        <label>С даты</label>
+    <div class="chart-row" id="dateRangeBlock" style="display:none; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+      <div>
+        <label style="font-size:12px; color:#8e8e93;">С даты</label>
         <input type="date" id="dateFrom">
       </div>
-      <div class="chart-field">
-        <label>По дату</label>
+      <div>
+        <label style="font-size:12px; color:#8e8e93;">По дату</label>
         <input type="date" id="dateTo">
       </div>
+    </div>
+
+    <div class="chip-group-label">Категории (тап — выбрать)</div>
+    <div class="chip-row" id="catChips">
+      <button class="chip active" data-c="__all" onclick="toggleCat('__all', this)">Все</button>
+    </div>
+    <div style="display:flex; gap:6px; margin-bottom:12px;">
+      <button class="chip small" onclick="selectAllCats()">Выбрать все</button>
+      <button class="chip small" onclick="deselectAllCats()">Снять все</button>
     </div>
 
     <button class="btn" onclick="buildChart()" style="margin-top: 8px;">🔍 Построить</button>
@@ -284,9 +278,14 @@ input:focus, select:focus { outline: none; border-color: #4CAF50; background: wh
 <!-- ===== ИСТОРИЯ ===== -->
 <div class="page" id="page-history">
   <div class="card">
-    <div class="section-title"><span>🕐 Последние записи</span></div>
-    <div class="clear-all-wrap"><button onclick="clearAll()">Очистить всё</button></div>
-    <div id="recentList"><div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div></div>
+    <details>
+      <summary style="list-style:none; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size:15px; font-weight:600; color:#8e8e93; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">
+        <span>🕐 Последние записи</span>
+        <span style="font-size:12px; color:#4CAF50;">▶</span>
+      </summary>
+      <div class="clear-all-wrap"><button onclick="clearAll()">Очистить всё</button></div>
+      <div id="recentList"><div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div></div>
+    </details>
   </div>
   <div class="card">
     <div class="section-title"><span>📊 Траты по периодам 11–10</span></div>
@@ -336,11 +335,14 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwZaU3xfaQqKa1IV6il
 
 let pendingCategory = null, allCategories = [], openGroups = {}, categoryTotals = {};
 let expandedDates = {}, expandedMonths = {};
-let allExpenses = null; // кэш всех трат для графиков
+let allExpenses = null;
 let mainChart = null, pdfSnapshots = [];
+let chartType = 'line', chartGroup = 'week', chartPeriod = 'thisWeek';
+let selectedCats = new Set(['__all']);
 const PALETTE = ['#4CAF50','#2196F3','#FF9800','#E91E63','#9C27B0','#00BCD4','#FFC107','#795548','#607D8B','#F44336','#8BC34A','#3F51B5'];
-const TYPE_NAMES = { line: 'Динамика', bar: 'Столбцы' };
+const TYPE_NAMES = { line: 'Линия', bar: 'Столбцы' };
 const GROUP_NAMES = { day: 'по дням', week: 'по неделям (Пн–Вс)', period: 'по периодам 11–10' };
+const PERIOD_NAMES = { thisWeek: 'эта неделя', lastWeek: 'прошлая неделя', prevWeek: 'позапрошлая неделя', thisMonth: 'текущий месяц', lastMonth: 'прошлый месяц', custom: 'свой период' };
 const PAGE_TITLES = { home: '💸 Расходы', charts: '📈 Графики', history: '🕐 История', categories: '🏷 Категории' };
 
 function getCategoryStyle(cat) {
@@ -436,7 +438,7 @@ async function submitExpense() {
       document.getElementById('catInput').value = '';
       document.getElementById('catInput').focus();
     } else { showResult('ok', '✅ Записано: ' + result.amount.toFixed(2) + ' ₽ → ' + result.category); input.value = ''; input.focus(); }
-    allExpenses = null; // сброс кэша
+    allExpenses = null;
     loadStats(); loadRecent(); loadCategories(); loadMonthly();
   } else showResult('err', '❌ ' + (result && result.error ? result.error : 'Ошибка'));
 }
@@ -686,49 +688,114 @@ async function loadAllExpenses() {
 
 async function loadChartCategories() {
   const data = await jsonp({ action: 'getCategoriesWithTotals' });
-  const sel = document.getElementById('chartCategory');
-  sel.innerHTML = '<option value="__all">Все категории</option>';
+  const box = document.getElementById('catChips');
+  box.innerHTML = '<button class="chip active" data-c="__all" onclick="toggleCat(\'__all\', this)">Все</button>';
   if (data && data.ok && data.groups) {
     data.groups.sort((a, b) => b.total - a.total).forEach(g => {
-      const opt = document.createElement('option');
-      opt.value = g.category; opt.textContent = g.category;
-      sel.appendChild(opt);
+      const btn = document.createElement('button');
+      btn.className = 'chip';
+      btn.setAttribute('data-c', g.category);
+      btn.textContent = g.category;
+      btn.onclick = function() { toggleCat(g.category, btn); };
+      box.appendChild(btn);
     });
   }
 }
 
-/* ===== БЫСТРЫЕ ПЕРИОДЫ ===== */
+/* ===== ПЕРЕКЛЮЧАТЕЛИ ===== */
+function setType(v, btn) {
+  chartType = v;
+  document.querySelectorAll('#typeChips .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+}
+function setGroup(v, btn) {
+  chartGroup = v;
+  document.querySelectorAll('#groupChips .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+}
+function setPeriod(v, btn) {
+  chartPeriod = v;
+  document.querySelectorAll('#periodChips .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const block = document.getElementById('dateRangeBlock');
+  if (v === 'custom') {
+    block.style.display = 'grid';
+    const today = new Date();
+    if (!document.getElementById('dateFrom').value) document.getElementById('dateFrom').value = iso(new Date(today.getFullYear(), today.getMonth(), 1));
+    if (!document.getElementById('dateTo').value) document.getElementById('dateTo').value = iso(today);
+  } else {
+    block.style.display = 'none';
+  }
+}
+
 function iso(d) {
   const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
   return y + '-' + m + '-' + day;
 }
-function setQuickPeriod(p, btn) {
-  document.querySelectorAll('#quickPeriods button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+
+function getPeriodDates() {
   const today = new Date();
-  const dateFrom = document.getElementById('dateFrom');
-  const dateTo = document.getElementById('dateTo');
-  const block = document.getElementById('dateRangeBlock');
-  if (p === 'custom') {
-    block.style.display = 'grid';
-    if (!dateFrom.value) dateFrom.value = iso(new Date(today.getFullYear(), today.getMonth(), 1));
-    if (!dateTo.value) dateTo.value = iso(today);
-    return;
-  }
-  block.style.display = 'none';
-  let from, to = today;
-  if (p === 'week') {
-    const day = today.getDay(); // 0=вс
-    const diff = today.getDate() - day + (day === 0 ? -6 : 1); // понедельник
+  today.setHours(0, 0, 0, 0);
+  let from, to = new Date(today);
+  if (chartPeriod === 'thisWeek') {
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
     from = new Date(today); from.setDate(diff);
-  } else if (p === 'month') {
+  } else if (chartPeriod === 'lastWeek') {
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1) - 7;
+    from = new Date(today); from.setDate(diff);
+    to = new Date(from); to.setDate(from.getDate() + 6);
+  } else if (chartPeriod === 'prevWeek') {
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1) - 14;
+    from = new Date(today); from.setDate(diff);
+    to = new Date(from); to.setDate(from.getDate() + 6);
+  } else if (chartPeriod === 'thisMonth') {
     from = new Date(today.getFullYear(), today.getMonth(), 1);
+  } else if (chartPeriod === 'lastMonth') {
+    from = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    to = new Date(today.getFullYear(), today.getMonth(), 0);
   } else {
-    const days = parseInt(p, 10);
-    from = new Date(today); from.setDate(today.getDate() - days + 1);
+    from = new Date(document.getElementById('dateFrom').value);
+    to = new Date(document.getElementById('dateTo').value);
   }
-  dateFrom.value = iso(from);
-  dateTo.value = iso(to);
+  to.setHours(23, 59, 59, 999);
+  return { from, to };
+}
+
+/* ===== КАТЕГОРИИ ===== */
+function toggleCat(cat, btn) {
+  if (cat === '__all') {
+    selectedCats = new Set(['__all']);
+    document.querySelectorAll('#catChips .chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+  } else {
+    selectedCats.delete('__all');
+    document.querySelector('#catChips .chip[data-c="__all"]').classList.remove('active');
+    if (selectedCats.has(cat)) { selectedCats.delete(cat); btn.classList.remove('active'); }
+    else { selectedCats.add(cat); btn.classList.add('active'); }
+    if (selectedCats.size === 0) {
+      selectedCats.add('__all');
+      document.querySelector('#catChips .chip[data-c="__all"]').classList.add('active');
+    }
+  }
+}
+function selectAllCats() {
+  selectedCats = new Set();
+  document.querySelectorAll('#catChips .chip').forEach(c => {
+    const v = c.getAttribute('data-c');
+    if (v !== '__all') { selectedCats.add(v); c.classList.add('active'); }
+    else c.classList.remove('active');
+  });
+}
+function deselectAllCats() {
+  selectedCats = new Set(['__all']);
+  document.querySelectorAll('#catChips .chip').forEach(c => {
+    const v = c.getAttribute('data-c');
+    if (v === '__all') c.classList.add('active');
+    else c.classList.remove('active');
+  });
 }
 
 /* ===== ПОСТРОЕНИЕ ГРАФИКА ===== */
@@ -765,24 +832,15 @@ function formatDayLabel(d) {
 
 async function buildChart() {
   if (!allExpenses) await loadAllExpenses();
-  if (!allExpenses || allExpenses.length === 0) {
-    alert('Нет данных для построения графика'); return;
-  }
-  const type = document.getElementById('chartType').value;
-  const group = document.getElementById('chartGroup').value;
-  const category = document.getElementById('chartCategory').value;
-  const fromStr = document.getElementById('dateFrom').value;
-  const toStr = document.getElementById('dateTo').value;
-  if (!fromStr || !toStr) { alert('Выберите период'); return; }
-  const fromDate = new Date(fromStr);
-  const toDate = new Date(toStr);
-  toDate.setHours(23, 59, 59, 999);
-
-  // Фильтр
+  if (!allExpenses || allExpenses.length === 0) { alert('Нет данных для построения графика'); return; }
+  
+  const { from, to } = getPeriodDates();
+  const allCats = selectedCats.has('__all');
+  
   const filtered = allExpenses.filter(r => {
     const d = new Date(r.dateOnly);
-    if (d < fromDate || d > toDate) return false;
-    if (category !== '__all' && r.category !== category) return false;
+    if (d < from || d > to) return false;
+    if (!allCats && !selectedCats.has(r.category)) return false;
     return true;
   });
 
@@ -792,15 +850,14 @@ async function buildChart() {
     alert('Нет трат за выбранный период'); return;
   }
 
-  // Агрегация
   const buckets = {};
   filtered.forEach(r => {
     const d = new Date(r.dateOnly);
     let key, label;
-    if (group === 'day') {
+    if (chartGroup === 'day') {
       key = iso(d);
       label = formatDayLabel(d);
-    } else if (group === 'week') {
+    } else if (chartGroup === 'week') {
       const mon = getMonday(d);
       key = iso(mon);
       label = formatWeekLabel(mon);
@@ -808,57 +865,85 @@ async function buildChart() {
       key = getPeriodKey11_10(d);
       label = formatPeriodLabel11_10(key);
     }
-    if (!buckets[key]) buckets[key] = { label: label, sum: 0, count: 0 };
+    if (!buckets[key]) buckets[key] = { label: label, sum: 0, count: 0, byCat: {} };
     buckets[key].sum += r.amount;
     buckets[key].count += 1;
+    buckets[key].byCat[r.category] = (buckets[key].byCat[r.category] || 0) + r.amount;
   });
 
   const sortedKeys = Object.keys(buckets).sort();
-  const labels = sortedKeys.map(k => buckets[k].label);
-  const data = sortedKeys.map(k => buckets[k].sum);
-  const totalSum = data.reduce((a, b) => a + b, 0);
+  const totalSum = sortedKeys.reduce((s, k) => s + buckets[k].sum, 0);
   const totalCount = filtered.length;
 
-  // График
   const ctx = document.getElementById('mainChart');
   if (mainChart) { mainChart.destroy(); mainChart = null; }
-  const color = '#4CAF50';
-  mainChart = new Chart(ctx, {
-    type: type,
-    data: {
-      labels: labels,
-      datasets: [{
-        label: category === '__all' ? 'Все категории' : category,
-        data: data,
-        backgroundColor: type === 'line' ? 'rgba(76,175,80,0.15)' : color,
-        borderColor: color,
-        borderWidth: 2,
-        tension: 0.3,
-        fill: type === 'line',
-        pointRadius: 3,
-        borderRadius: type === 'bar' ? 4 : 0
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: {
-        y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('ru-RU') } }
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: c => ' ' + c.parsed.y.toLocaleString('ru-RU') + ' ₽ (' + buckets[sortedKeys[c.dataIndex]].count + ' шт.)' } }
-      }
-    }
-  });
 
-  // Сводка
-  const catLabel = category === '__all' ? 'все категории' : category;
-  const periodLabel = fromStr + ' — ' + toStr;
+  if (allCats && chartGroup !== 'day') {
+    // Одна линия/столбцы — сумма по всем категориям
+    const labels = sortedKeys.map(k => buckets[k].label);
+    const data = sortedKeys.map(k => buckets[k].sum);
+    const color = '#4CAF50';
+    mainChart = new Chart(ctx, {
+      type: chartType,
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Все категории',
+          data: data,
+          backgroundColor: chartType === 'line' ? 'rgba(76,175,80,0.15)' : color,
+          borderColor: color,
+          borderWidth: 2,
+          tension: 0.3,
+          fill: chartType === 'line',
+          pointRadius: 3,
+          borderRadius: chartType === 'bar' ? 4 : 0
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('ru-RU') } } },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: c => ' ' + c.parsed.y.toLocaleString('ru-RU') + ' ₽ (' + buckets[sortedKeys[c.dataIndex]].count + ' шт.)' } }
+        }
+      }
+    });
+  } else {
+    // Несколько линий/столбцов — по каждой категории
+    const cats = allCats ? Object.keys(buckets[sortedKeys[0]].byCat) : Array.from(selectedCats);
+    const labels = sortedKeys.map(k => buckets[k].label);
+    const datasets = cats.map((cat, i) => ({
+      label: cat,
+      data: sortedKeys.map(k => buckets[k].byCat[cat] || 0),
+      backgroundColor: chartType === 'line' ? 'transparent' : PALETTE[i % PALETTE.length],
+      borderColor: PALETTE[i % PALETTE.length],
+      borderWidth: 2,
+      tension: 0.3,
+      fill: chartType === 'line',
+      pointRadius: 3,
+      borderRadius: chartType === 'bar' ? 4 : 0
+    }));
+    mainChart = new Chart(ctx, {
+      type: chartType,
+      data: { labels: labels, datasets: datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('ru-RU') } } },
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+          tooltip: { callbacks: { label: c => ' ' + c.dataset.label + ': ' + c.parsed.y.toLocaleString('ru-RU') + ' ₽' } }
+        }
+      }
+    });
+  }
+
+  const catLabel = allCats ? 'все категории' : Array.from(selectedCats).join(', ');
+  const periodLabel = iso(from) + ' — ' + iso(to);
   const avg = totalSum / sortedKeys.length;
   document.getElementById('chartSummary').style.display = 'block';
   document.getElementById('chartSummary').innerHTML =
     '<b>' + totalSum.toLocaleString('ru-RU') + ' ₽</b> за период · ' + totalCount + ' трат' +
-    '<br><span style="color:#8e8e93;font-size:12px;">' + periodLabel + ' · ' + catLabel + ' · ' + GROUP_NAMES[group] + '</span>' +
+    '<br><span style="color:#8e8e93;font-size:12px;">' + periodLabel + ' · ' + catLabel + ' · ' + GROUP_NAMES[chartGroup] + '</span>' +
     '<br><span style="color:#8e8e93;font-size:12px;">Среднее за точку: <b>' + avg.toFixed(0) + ' ₽</b></span>';
 }
 
@@ -874,13 +959,10 @@ function snapshotCanvas() {
   return c.toDataURL('image/png');
 }
 function currentChartTitle() {
-  const type = document.getElementById('chartType').value;
-  const group = document.getElementById('chartGroup').value;
-  const category = document.getElementById('chartCategory').value;
-  const fromStr = document.getElementById('dateFrom').value;
-  const toStr = document.getElementById('dateTo').value;
-  const catLabel = category === '__all' ? 'все категории' : category;
-  return TYPE_NAMES[type] + ' · ' + GROUP_NAMES[group] + ' · ' + catLabel + ' (' + fromStr + ' – ' + toStr + ')';
+  const { from, to } = getPeriodDates();
+  const allCats = selectedCats.has('__all');
+  const catLabel = allCats ? 'все категории' : Array.from(selectedCats).join(', ');
+  return TYPE_NAMES[chartType] + ' · ' + GROUP_NAMES[chartGroup] + ' · ' + catLabel + ' (' + PERIOD_NAMES[chartPeriod] + ', ' + iso(from) + ' – ' + iso(to) + ')';
 }
 function addToPdf() {
   if (!mainChart) { alert('Сначала постройте график'); return; }
@@ -927,9 +1009,7 @@ function downloadPdf() {
 document.getElementById('text').addEventListener('keypress', e => { if (e.key === 'Enter') submitExpense(); });
 document.getElementById('catInput').addEventListener('keypress', e => { if (e.key === 'Enter') submitCategory(); });
 
-// Инициализация
 loadStats(); loadRecent(); loadCategories(); loadMonthly();
-setQuickPeriod('week', document.querySelector('#quickPeriods button[data-p="week"]'));
 renderPdfPreview();
 
 if ('serviceWorker' in navigator) {
