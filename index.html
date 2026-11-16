@@ -49,13 +49,13 @@ body {
 .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 h2 { font-size: 20px; margin: 0 0 4px; font-weight: 700; }
 .subtitle { color: #8e8e93; font-size: 14px; margin-bottom: 20px; }
-input[type=text], input[type=date], select {
+input[type=text], input[type=date] {
   width: 100%; padding: 12px; font-size: 15px;
   border: 1.5px solid #e5e5ea; border-radius: 10px;
   background: #f9f9fb; font-family: inherit;
   -webkit-user-select: text; user-select: text; color: #1c1c1e;
 }
-input:focus, select:focus { outline: none; border-color: #4CAF50; background: white; }
+input:focus { outline: none; border-color: #4CAF50; background: white; }
 .btn {
   width: 100%; padding: 14px; font-size: 16px; font-weight: 600;
   background: #4CAF50; color: white; border: none; border-radius: 12px; cursor: pointer;
@@ -171,6 +171,8 @@ input:focus, select:focus { outline: none; border-color: #4CAF50; background: wh
 .pdf-empty { color: #8e8e93; font-size: 13px; text-align: center; padding: 8px; }
 .clear-all-wrap { display: flex; justify-content: flex-end; margin-bottom: 12px; }
 .clear-all-wrap button { background: transparent; border: 1px solid #ff3b30; color: #ff3b30; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: inherit; }
+.date-range-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.date-range-row label { font-size: 12px; color: #8e8e93; display: block; margin-bottom: 4px; }
 </style>
 </head>
 <body>
@@ -241,13 +243,13 @@ input:focus, select:focus { outline: none; border-color: #4CAF50; background: wh
       <button class="chip" data-p="custom" onclick="setPeriod('custom', this)">Свой период</button>
     </div>
 
-    <div class="chart-row" id="dateRangeBlock" style="display:none; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+    <div class="date-range-row" id="dateRangeBlock" style="display:none;">
       <div>
-        <label style="font-size:12px; color:#8e8e93;">С даты</label>
+        <label>С даты</label>
         <input type="date" id="dateFrom">
       </div>
       <div>
-        <label style="font-size:12px; color:#8e8e93;">По дату</label>
+        <label>По дату</label>
         <input type="date" id="dateTo">
       </div>
     </div>
@@ -772,12 +774,13 @@ function toggleCat(cat, btn) {
     btn.classList.add('active');
   } else {
     selectedCats.delete('__all');
-    document.querySelector('#catChips .chip[data-c="__all"]').classList.remove('active');
+    const allBtn = document.querySelector('#catChips .chip[data-c="__all"]');
+    if (allBtn) allBtn.classList.remove('active');
     if (selectedCats.has(cat)) { selectedCats.delete(cat); btn.classList.remove('active'); }
     else { selectedCats.add(cat); btn.classList.add('active'); }
     if (selectedCats.size === 0) {
       selectedCats.add('__all');
-      document.querySelector('#catChips .chip[data-c="__all"]').classList.add('active');
+      if (allBtn) allBtn.classList.add('active');
     }
   }
 }
@@ -878,8 +881,7 @@ async function buildChart() {
   const ctx = document.getElementById('mainChart');
   if (mainChart) { mainChart.destroy(); mainChart = null; }
 
-  if (allCats && chartGroup !== 'day') {
-    // Одна линия/столбцы — сумма по всем категориям
+  if (allCats) {
     const labels = sortedKeys.map(k => buckets[k].label);
     const data = sortedKeys.map(k => buckets[k].sum);
     const color = '#4CAF50';
@@ -909,8 +911,7 @@ async function buildChart() {
       }
     });
   } else {
-    // Несколько линий/столбцов — по каждой категории
-    const cats = allCats ? Object.keys(buckets[sortedKeys[0]].byCat) : Array.from(selectedCats);
+    const cats = Array.from(selectedCats);
     const labels = sortedKeys.map(k => buckets[k].label);
     const datasets = cats.map((cat, i) => ({
       label: cat,
