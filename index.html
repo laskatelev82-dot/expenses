@@ -11,7 +11,6 @@
 <link rel="manifest" href="manifest.json">
 <title>Расходы</title>
 
-<!-- БИБЛИОТЕКИ ДЛЯ ГРАФИКОВ И PDF -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -20,15 +19,48 @@
 html, body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  margin: 0; padding: 16px;
-  padding-top: calc(16px + env(safe-area-inset-top));
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  margin: 0; padding: 0;
+  padding-top: calc(env(safe-area-inset-top) + 56px);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 64px);
   background: #f0f2f5; min-height: 100vh; color: #1c1c1e;
-  max-width: 600px; margin-left: auto; margin-right: auto;
 }
+
+/* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
+.top-bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 56px; background: #4CAF50; color: white;
+  display: flex; align-items: center; padding: 0 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 100;
+}
+.top-bar h1 { font-size: 18px; margin: 0; font-weight: 600; }
+
+/* ===== НИЖНЯЯ НАВИГАЦИЯ ===== */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 64px; background: white;
+  display: flex; border-top: 1px solid #e5e5ea;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05); z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s;
+  color: #8e8e93; font-size: 11px; font-weight: 500;
+  -webkit-user-select: none; user-select: none;
+}
+.nav-item:active { background: #f5f5f5; }
+.nav-item.active { color: #4CAF50; }
+.nav-icon { font-size: 22px; margin-bottom: 2px; }
+
+/* ===== СТРАНИЦЫ ===== */
+.page { display: none; padding: 16px; max-width: 600px; margin: 0 auto; }
+.page.active { display: block; }
+
 .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-h1 { font-size: 24px; margin: 0 0 4px; font-weight: 700; }
+h2 { font-size: 20px; margin: 0 0 4px; font-weight: 700; }
 .subtitle { color: #8e8e93; font-size: 14px; margin-bottom: 20px; }
+
 input[type=text] {
   width: 100%; padding: 16px; font-size: 17px;
   border: 2px solid #e5e5ea; border-radius: 12px;
@@ -38,6 +70,7 @@ input[type=text] {
 }
 input[type=text]:focus { outline: none; border-color: #4CAF50; background: white; }
 .search-input { padding: 10px 14px; font-size: 15px; margin-bottom: 12px; }
+
 .btn {
   width: 100%; padding: 16px; font-size: 17px; font-weight: 600;
   background: #4CAF50; color: white; border: none; border-radius: 12px; cursor: pointer;
@@ -47,6 +80,7 @@ input[type=text]:focus { outline: none; border-color: #4CAF50; background: white
 .btn:disabled { background: #ccc; cursor: not-allowed; }
 .btn-secondary { background: #f0f2f5; color: #1c1c1e; margin-top: 8px; }
 .btn-secondary:active { background: #e5e5ea; }
+
 .result {
   margin-top: 12px; padding: 14px; border-radius: 12px;
   font-size: 15px; display: none; animation: slideIn 0.3s ease;
@@ -133,7 +167,6 @@ input[type=text]:focus { outline: none; border-color: #4CAF50; background: white
 .acc-word-btn:active { opacity: 1; transform: scale(0.92); }
 .acc-word-btn.edit { color: #007aff; }
 .acc-word-btn.del { color: #ff3b30; }
-
 .acc-food      { background: #FFF3E0; color: #E65100; }
 .acc-transport { background: #E3F2FD; color: #0D47A1; }
 .acc-home      { background: #F3E5F5; color: #4A148C; }
@@ -161,18 +194,6 @@ input[type=text]:focus { outline: none; border-color: #4CAF50; background: white
 .category-prompt p { margin: 0 0 12px; font-size: 15px; color: #856404; }
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-/* ===== СВЁРНУТЫЕ ПОСЛЕДНИЕ ЗАПИСИ ===== */
-details.recent-details summary {
-  list-style: none; cursor: pointer;
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 15px; font-weight: 600; color: #8e8e93;
-  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;
-}
-details.recent-details summary::-webkit-details-marker { display: none; }
-details.recent-details summary .sec-left { display: flex; align-items: center; gap: 8px; }
-details.recent-details summary .chev { font-size: 12px; color: #4CAF50; transition: transform 0.2s; }
-details.recent-details[open] summary .chev { transform: rotate(90deg); }
 
 /* ===== ГРАФИКИ ===== */
 .chart-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
@@ -212,115 +233,137 @@ details.recent-details[open] summary .chev { transform: rotate(90deg); }
 .pdf-preview .pp-item img { width: 44px; height: 30px; object-fit: contain; background: #fff; border-radius: 4px; border: 1px solid #eee; }
 .pdf-preview .pp-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pdf-empty { color: #8e8e93; font-size: 13px; text-align: center; padding: 8px; }
+
+/* ===== КНОПКА ОЧИСТИТЬ ===== */
+.clear-all-wrap { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+.clear-all-wrap button {
+  background: transparent; border: 1px solid #ff3b30; color: #ff3b30;
+  padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer;
+  font-family: inherit;
+}
+.clear-all-wrap button:active { background: #fff0f0; }
 </style>
 </head>
 <body>
 
-<div class="card">
-  <h1>💸 Расходы</h1>
-  <div class="subtitle">Пиши траты или спрашивай ИИ</div>
-  <input type="text" id="text" placeholder="кофе 300 или «на что уходит больше?»" autocomplete="off" autofocus>
-  <button class="btn" id="btn" onclick="submitExpense()">Отправить</button>
-  <div class="result" id="result"></div>
-  <div class="stats" style="margin-top: 16px;">
-    <div class="stat-box"><div class="stat-value green" id="todayTotal">—</div><div class="stat-label">Сегодня</div></div>
-    <div class="stat-box"><div class="stat-value" id="monthTotal">—</div><div class="stat-label">За месяц</div></div>
+<!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+<div class="top-bar">
+  <h1 id="topTitle">💸 Расходы</h1>
+</div>
+
+<!-- ===== СТРАНИЦА 1: ГЛАВНАЯ ===== -->
+<div class="page active" id="page-home">
+  <div class="card">
+    <h2>Новая трата</h2>
+    <div class="subtitle">Пиши траты или спрашивай ИИ</div>
+    <input type="text" id="text" placeholder="кофе 300 или «на что уходит больше?»" autocomplete="off" autofocus>
+    <button class="btn" id="btn" onclick="submitExpense()">Отправить</button>
+    <div class="result" id="result"></div>
+    <div class="category-prompt" id="catPrompt">
+      <p>🤔 Не знаю категорию для «<b id="catKeyword"></b>».</p>
+      <input type="text" id="catInput" placeholder="Спорт, Хобби, Дети..." autocomplete="off">
+      <button class="btn" onclick="submitCategory()">Сохранить категорию</button>
+      <button class="btn btn-secondary" onclick="cancelCategory()">Отменить</button>
+    </div>
   </div>
-  <div class="category-prompt" id="catPrompt">
-    <p>🤔 Не знаю категорию для «<b id="catKeyword"></b>».</p>
-    <input type="text" id="catInput" placeholder="Спорт, Хобби, Дети..." autocomplete="off">
-    <button class="btn" onclick="submitCategory()">Сохранить категорию</button>
-    <button class="btn btn-secondary" onclick="cancelCategory()">Отменить</button>
+  <div class="card">
+    <div class="section-title"><span>📊 Статистика</span></div>
+    <div class="stats">
+      <div class="stat-box"><div class="stat-value green" id="todayTotal">—</div><div class="stat-label">Сегодня</div></div>
+      <div class="stat-box"><div class="stat-value" id="monthTotal">—</div><div class="stat-label">За месяц</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="help-toggle" onclick="toggleHelp()">
+      <span>❓ Как пользоваться</span>
+      <span id="helpArrow">▼</span>
+    </div>
+    <div class="help-content" id="helpContent">
+      <p><b>📝 Запись:</b> <code>кофе 300</code> — мгновенно.</p>
+      <p><b>🤖 ИИ-помощник:</b> просто задай вопрос:</p>
+      <p>• <code>создай категорию Кружки</code></p>
+      <p>• <code>на что уходит больше за месяц?</code></p>
+      <p>• <code>что приготовить из курицы?</code></p>
+    </div>
   </div>
 </div>
 
-<!-- ===== ГРАФИКИ (вместо быстрых трат) ===== -->
-<div class="card" id="chartSection">
-  <div class="section-title"><span>📈 Графики</span></div>
-  <div class="chart-controls">
-    <select id="chartType" onchange="onChartTypeChange()">
-      <option value="line">Динамика трат</option>
-      <option value="pie">Распределение по категориям</option>
-      <option value="bar">По периодам (столбцы)</option>
-    </select>
-    <select id="chartPeriod" onchange="drawChart()">
-      <option value="3">3 периода</option>
-      <option value="6" selected>6 периодов</option>
-      <option value="12">12 периодов</option>
-      <option value="all">Все</option>
-    </select>
-    <select id="chartMode" onchange="drawChart()">
-      <option value="sum">Суммарно</option>
-      <option value="per">По каждой категории</option>
-    </select>
+<!-- ===== СТРАНИЦА 2: ГРАФИКИ ===== -->
+<div class="page" id="page-charts">
+  <div class="card">
+    <div class="section-title"><span>📈 Графики</span></div>
+    <div class="chart-controls">
+      <select id="chartType" onchange="onChartTypeChange()">
+        <option value="line">Динамика по дням</option>
+        <option value="bar">По периодам (столбцы)</option>
+      </select>
+      <select id="chartPeriod" onchange="drawChart()">
+        <option value="3">3 периода</option>
+        <option value="6" selected>6 периодов</option>
+        <option value="12">12 периодов</option>
+        <option value="all">Все</option>
+      </select>
+      <select id="chartMode" onchange="drawChart()">
+        <option value="sum">Суммарно</option>
+        <option value="per">По каждой категории</option>
+      </select>
+    </div>
+    <div class="chips-actions">
+      <button onclick="selectCats('all')">Все категории</button>
+      <button onclick="selectCats('none')">Снять</button>
+      <button onclick="loadGraphData()">🔄 Обновить</button>
+    </div>
+    <div class="cat-chips" id="catChips"><div class="pdf-empty">Загрузка…</div></div>
+    <div class="chart-toolbar">
+      <button class="primary" onclick="addToPdf()">➕ В PDF</button>
+      <button class="pdf" onclick="downloadPdf()">📥 Скачать (<span id="pdfCount">0</span>)</button>
+      <button onclick="clearPdf()">🗑 Очистить</button>
+    </div>
+    <div class="chart-wrapper"><canvas id="mainChart"></canvas></div>
+    <div class="pdf-preview" id="pdfPreview"></div>
   </div>
-  <div class="chips-actions">
-    <button onclick="selectCats('all')">Все</button>
-    <button onclick="selectCats('none')">Снять</button>
-    <button onclick="loadGraphData()">🔄 Данные</button>
-  </div>
-  <div class="cat-chips" id="catChips"><div class="pdf-empty">Загрузка категорий…</div></div>
-  <div class="chart-toolbar">
-    <button class="primary" onclick="addToPdf()">➕ В PDF-пакет</button>
-    <button class="pdf" onclick="downloadPdf()">📥 Скачать PDF (<span id="pdfCount">0</span>)</button>
-    <button onclick="clearPdf()">🗑 Очистить пакет</button>
-  </div>
-  <div class="chart-wrapper"><canvas id="mainChart"></canvas></div>
-  <div class="pdf-preview" id="pdfPreview"></div>
 </div>
 
-<!-- ===== ПОСЛЕДНИЕ ЗАПИСИ — СВЁРНУТЫ ПО УМОЛЧАНИЮ ===== -->
-<div class="card">
-  <details class="recent-details">
-    <summary>
-      <span class="sec-left"><span class="chev">▶</span><span>🕐 Последние записи</span></span>
-      <button class="delete-btn" style="font-size:13px;" onclick="event.preventDefault(); event.stopPropagation(); clearAll()">Очистить всё</button>
-    </summary>
+<!-- ===== СТРАНИЦА 3: ИСТОРИЯ ===== -->
+<div class="page" id="page-history">
+  <div class="card">
+    <div class="section-title"><span>🕐 Последние записи</span></div>
+    <div class="clear-all-wrap">
+      <button onclick="clearAll()">Очистить всё</button>
+    </div>
     <div id="recentList">
       <div style="color:#8e8e93; font-size:14px; text-align:center; padding:8px;">Загрузка...</div>
     </div>
-  </details>
-</div>
-
-<div class="card" id="catSection">
-  <div class="section-title">
-    <span id="catSectionTitle">🏷 Категории</span>
-    <button class="add-cat-btn" onclick="showAddCategory()">+ Добавить</button>
   </div>
-  <input type="text" id="catSearch" class="search-input" placeholder="🔍 Поиск категории..." autocomplete="off" oninput="filterCategories()">
-  <div id="catAccordion">
-    <div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Загрузка...</div>
-  </div>
-  <div class="edit-form" id="addCatForm">
-    <input type="text" id="newCatKeyword" placeholder="Ключевое слово" autocomplete="off">
-    <input type="text" id="newCatValue" placeholder="Категория" autocomplete="off">
-    <button class="btn" onclick="saveNewCategory()">Сохранить</button>
-    <button class="btn btn-secondary" onclick="hideAddCategory()">Отменить</button>
+  <div class="card">
+    <div class="section-title"><span>📊 Траты по периодам</span></div>
+    <div id="monthlyList">
+      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Загрузка...</div>
+    </div>
   </div>
 </div>
 
-<div class="card" id="monthlySection">
-  <div class="section-title"><span>📊 Траты по месяцам</span></div>
-  <div id="monthlyList">
-    <div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Загрузка...</div>
+<!-- ===== СТРАНИЦА 4: КАТЕГОРИИ ===== -->
+<div class="page" id="page-categories">
+  <div class="card" id="catSection">
+    <div class="section-title">
+      <span id="catSectionTitle">🏷 Категории</span>
+      <button class="add-cat-btn" onclick="showAddCategory()">+ Добавить</button>
+    </div>
+    <input type="text" id="catSearch" class="search-input" placeholder="🔍 Поиск категории..." autocomplete="off" oninput="filterCategories()">
+    <div id="catAccordion">
+      <div style="color:#8e8e93; font-size:14px; text-align:center; padding:16px;">Загрузка...</div>
+    </div>
+    <div class="edit-form" id="addCatForm">
+      <input type="text" id="newCatKeyword" placeholder="Ключевое слово" autocomplete="off">
+      <input type="text" id="newCatValue" placeholder="Категория" autocomplete="off">
+      <button class="btn" onclick="saveNewCategory()">Сохранить</button>
+      <button class="btn btn-secondary" onclick="hideAddCategory()">Отменить</button>
+    </div>
   </div>
 </div>
 
-<div class="card">
-  <div class="help-toggle" onclick="toggleHelp()">
-    <span>❓ Как пользоваться</span>
-    <span id="helpArrow">▼</span>
-  </div>
-  <div class="help-content" id="helpContent">
-    <p><b>📝 Запись:</b> <code>кофе 300</code> — мгновенно.</p>
-    <p><b>📈 Графики:</b> выбери тип, период и категории чипами. Кнопка «➕ В PDF» кладёт график в пакет, «📥 Скачать PDF» собирает их в один файл.</p>
-    <p><b>🤖 ИИ-помощник:</b> просто задай вопрос:</p>
-    <p>• <code>создай категорию Кружки</code></p>
-    <p>• <code>на что уходит больше за месяц?</code></p>
-    <p>• <code>что приготовить из курицы?</code></p>
-  </div>
-</div>
-
+<!-- МОДАЛКА ПОИСКА -->
 <div class="modal" id="searchModal" onclick="if(event.target===this)closeSearchModal()">
   <div class="modal-content">
     <div class="modal-header">
@@ -331,11 +374,26 @@ details.recent-details[open] summary .chev { transform: rotate(90deg); }
   </div>
 </div>
 
-<!-- Скрытый контейнер для сборки PDF -->
+<!-- СКРЫТЫЙ КОНТЕЙНЕР ДЛЯ PDF -->
 <div id="pdfDoc" style="display:none; position:absolute; left:-9999px; top:0; width:700px; background:#fff; padding:24px; font-family:Arial,sans-serif; color:#1c1c1e;"></div>
 
+<!-- НИЖНЯЯ НАВИГАЦИЯ -->
+<div class="bottom-nav">
+  <div class="nav-item active" data-page="home" onclick="switchPage('home')">
+    <div class="nav-icon">🏠</div><div>Главная</div>
+  </div>
+  <div class="nav-item" data-page="charts" onclick="switchPage('charts')">
+    <div class="nav-icon">📈</div><div>Графики</div>
+  </div>
+  <div class="nav-item" data-page="history" onclick="switchPage('history')">
+    <div class="nav-icon">🕐</div><div>История</div>
+  </div>
+  <div class="nav-item" data-page="categories" onclick="switchPage('categories')">
+    <div class="nav-icon">🏷</div><div>Категории</div>
+  </div>
+</div>
+
 <script>
-// ВАШ SCRIPT_URL (остался без изменений)
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwZaU3xfaQqKa1IV6ilnULNIerYocRtEZT7Gb9duB5pgMCFm_OJpBrH8IKL699_byf/exec';
 
 let pendingCategory = null;
@@ -345,14 +403,14 @@ let categoryTotals = {};
 let expandedDates = {};
 let expandedMonths = {};
 
-/* ===== СОСТОЯНИЕ ГРАФИКОВ ===== */
 let monthlyData = [];
 let chartCats = [];
 let selectedCats = new Set();
 let mainChart = null;
 let pdfSnapshots = [];
 const PALETTE = ['#4CAF50','#2196F3','#FF9800','#E91E63','#9C27B0','#00BCD4','#FFC107','#795548','#607D8B','#F44336','#8BC34A','#3F51B5'];
-const TYPE_NAMES = { line: 'Динамика', pie: 'Распределение', bar: 'По периодам' };
+const TYPE_NAMES = { line: 'Динамика', bar: 'По периодам' };
+const PAGE_TITLES = { home: '💸 Расходы', charts: '📈 Графики', history: '🕐 История', categories: '🏷 Категории' };
 
 function getCategoryStyle(cat) {
   const key = String(cat).toLowerCase().trim();
@@ -367,6 +425,16 @@ function getCategoryStyle(cat) {
     'другое': { emoji: '📦', cls: 'acc-default' }
   };
   return CATEGORY_STYLES[key] || { emoji: '🏷', cls: 'acc-default' };
+}
+
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector('.nav-item[data-page="' + page + '"]').classList.add('active');
+  document.getElementById('topTitle').textContent = PAGE_TITLES[page] || '💸 Расходы';
+  window.scrollTo(0, 0);
+  if (page === 'charts' && !mainChart) { loadGraphData(); }
 }
 
 function jsonp(params) {
@@ -815,9 +883,7 @@ function toggleHelp() {
   a.textContent = c.classList.contains('show') ? '▲' : '▼';
 }
 
-/* ============================================
-   ГРАФИКИ
-   ============================================ */
+/* ===== ГРАФИКИ ===== */
 async function loadGraphData() {
   const data = await jsonp({ action: 'getMonthlyTotals' });
   if (!data || !data.ok || !data.periods) { monthlyData = []; } else { monthlyData = data.periods; }
@@ -837,7 +903,7 @@ async function loadGraphData() {
 
 function buildCatChips() {
   const box = document.getElementById('catChips');
-  if (chartCats.length === 0) { box.innerHTML = '<div class="pdf-empty">Нет данных для графика</div>'; return; }
+  if (chartCats.length === 0) { box.innerHTML = '<div class="pdf-empty">Нет данных</div>'; return; }
   box.innerHTML = chartCats.map(function(cat) {
     const active = selectedCats.has(cat) ? ' active' : '';
     return '<button class="cat-chip' + active + '" onclick="toggleCat(\'' + escapeJs(cat) + '\')">' + escapeHtml(cat) + '</button>';
@@ -910,7 +976,7 @@ function drawChart() {
         let s = 0; cats.forEach(function(c) { s += (p.categories && p.categories[c]) || 0; });
         return s;
       });
-      datasets = [{ label: 'Сумма выбранных', data: sums, borderColor: '#4CAF50', backgroundColor: 'rgba(76,175,80,0.15)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 3 }];
+      datasets = [{ label: 'Сумма', data: sums, borderColor: '#4CAF50', backgroundColor: 'rgba(76,175,80,0.15)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 3 }];
     }
     mainChart = new Chart(ctx, {
       type: 'line',
@@ -921,22 +987,6 @@ function drawChart() {
         plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }, tooltip: { callbacks: { label: function(c) { return ' ' + c.dataset.label + ': ' + c.parsed.y.toLocaleString('ru-RU') + ' ₽'; } } } }
       }
     });
-  } else if (type === 'pie') {
-    const totals = {};
-    cats.forEach(function(c) { totals[c] = 0; });
-    periods.forEach(function(p) { cats.forEach(function(c) { totals[c] += (p.categories && p.categories[c]) || 0; }); });
-    const entries = cats.map(function(c) { return [c, totals[c]]; }).filter(function(e) { return e[1] > 0; });
-    mainChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: entries.map(function(e) { return e[0]; }),
-        datasets: [{ data: entries.map(function(e) { return e[1]; }), backgroundColor: entries.map(function(e, i) { return PALETTE[chartCats.indexOf(e[0]) % PALETTE.length]; }), borderWidth: 2, borderColor: '#fff' }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }, tooltip: { callbacks: { label: function(c) { return ' ' + c.label + ': ' + c.parsed.toLocaleString('ru-RU') + ' ₽'; } } } }
-      }
-    });
   } else {
     const sums = periods.map(function(p) {
       let s = 0; cats.forEach(function(c) { s += (p.categories && p.categories[c]) || 0; });
@@ -944,7 +994,7 @@ function drawChart() {
     });
     mainChart = new Chart(ctx, {
       type: 'bar',
-      data: { labels: labels, datasets: [{ label: 'Сумма выбранных (₽)', data: sums, backgroundColor: '#4CAF50', borderRadius: 4 }] },
+      data: { labels: labels, datasets: [{ label: 'Сумма (₽)', data: sums, backgroundColor: '#4CAF50', borderRadius: 4 }] },
       options: {
         responsive: true, maintainAspectRatio: false,
         scales: { y: { beginAtZero: true, ticks: { callback: function(v) { return v.toLocaleString('ru-RU'); } } } },
@@ -954,7 +1004,7 @@ function drawChart() {
   }
 }
 
-/* ===== PDF-ПАКЕТ ===== */
+/* ===== PDF ===== */
 function snapshotCanvas() {
   const src = document.getElementById('mainChart');
   if (!src || !src.width) return null;
@@ -998,7 +1048,7 @@ function clearPdf() {
 function renderPdfPreview() {
   document.getElementById('pdfCount').textContent = pdfSnapshots.length;
   const box = document.getElementById('pdfPreview');
-  if (pdfSnapshots.length === 0) { box.innerHTML = '<div class="pdf-empty">Пакет пуст. Постройте график и нажмите «➕ В PDF-пакет».</div>'; return; }
+  if (pdfSnapshots.length === 0) { box.innerHTML = '<div class="pdf-empty">Пакет пуст. Постройте график и нажмите «➕ В PDF».</div>'; return; }
   box.innerHTML = pdfSnapshots.map(function(s) {
     return '<div class="pp-item"><img src="' + s.img + '"><span class="pp-title">' + escapeHtml(s.title) + '</span>' +
       '<button class="delete-btn" onclick="removePdfItem(' + s.id + ')">✕</button></div>';
