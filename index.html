@@ -33,7 +33,6 @@ body {
   padding-bottom: calc(env(safe-area-inset-bottom) + 76px);
   background: var(--bg); min-height: 100vh; color: var(--ink);
 }
-/* скроллбары в языке приложения */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: #e7efe9; border-radius: 8px; }
 ::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#4CAF50,#2e7d4f); border-radius: 8px; border: 2px solid #e7efe9; }
@@ -70,7 +69,6 @@ input:focus { outline: none; border-color: var(--brand); background: #fff; }
 .section-title { font-size: 14px; font-weight: 700; color: var(--mut); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .search-input { padding: 10px 14px; font-size: 15px; margin-bottom: 12px; }
 
-/* чипы */
 .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 .chip { padding: 8px 14px; font-size: 13px; font-weight: 600; border-radius: 20px; border: 1.5px solid var(--line); background: #f9f9fb; color: var(--ink); cursor: pointer; font-family: inherit; transition: all .15s; }
 .chip:active { transform: scale(.94); }
@@ -78,7 +76,6 @@ input:focus { outline: none; border-color: var(--brand); background: #fff; }
 .chip.small { padding: 6px 10px; font-size: 12px; }
 .chip-group-label { font-size: 11px; color: var(--mut); font-weight: 700; margin: 2px 0 6px; text-transform: uppercase; letter-spacing: .5px; }
 
-/* переключатели */
 .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 14px; }
 .switch { display: flex; align-items: center; gap: 9px; cursor: pointer; font-size: 13px; font-weight: 600; color: #3c4a41; }
 .switch input { display: none; }
@@ -87,12 +84,14 @@ input:focus { outline: none; border-color: var(--brand); background: #fff; }
 .switch input:checked + .tr { background: linear-gradient(90deg,#43a047,#3ddc84); }
 .switch input:checked + .tr::after { left: 18px; }
 
-/* сцена графика */
 .chart-stage { position: relative; border-radius: 16px; overflow: hidden; background: radial-gradient(120% 90% at 15% 0%, #16402c 0%, var(--pine-7) 40%, var(--pine-8) 78%, var(--pine-9) 100%); box-shadow: inset 0 0 0 1px rgba(61,220,132,.22), inset 0 -30px 60px rgba(0,0,0,.35), 0 10px 26px rgba(8,27,18,.35); }
 .chart-stage::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(60% 40% at 85% 100%, rgba(56,189,248,.10), transparent 60%), radial-gradient(50% 35% at 10% 100%, rgba(244,114,182,.07), transparent 60%); }
 .chart-canvas-wrap { position: relative; height: 340px; }
 @media (min-width: 560px) { .chart-canvas-wrap { height: 390px; } }
 #mainChart { touch-action: none; }
+.stage-msg { position: absolute; inset: 0; z-index: 4; display: none; align-items: center; justify-content: center; text-align: center; color: var(--mint-ink); font-size: 14px; font-weight: 600; line-height: 1.7; padding: 20px 56px 20px 20px; }
+.stage-msg.show { display: flex; }
+.stage-msg .chip { margin-top: 10px; }
 .zoom-badge { position: absolute; left: 10px; top: 10px; z-index: 5; background: rgba(9,30,21,.78); border: 1px solid rgba(61,220,132,.35); color: var(--mint-ink); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 20px; backdrop-filter: blur(6px); font-variant-numeric: tabular-nums; pointer-events: none; }
 .zoom-bar { position: absolute; right: 8px; top: 8px; z-index: 6; display: flex; flex-direction: column; gap: 6px; }
 .zbtn { width: 36px; height: 36px; border-radius: 11px; border: 1px solid rgba(61,220,132,.4); background: rgba(9,30,21,.78); color: var(--mint-ink); font-size: 17px; font-weight: 800; cursor: pointer; backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; transition: all .15s; font-family: inherit; line-height: 1; }
@@ -121,7 +120,6 @@ input:focus { outline: none; border-color: var(--brand); background: #fff; }
 .pp-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pdf-empty { color: var(--mut); font-size: 13px; text-align: center; padding: 8px; }
 
-/* шторка дня */
 .sheet { position: fixed; inset: 0; z-index: 1200; display: none; align-items: flex-end; background: rgba(6,20,14,.55); backdrop-filter: blur(2px); }
 .sheet.show { display: flex; animation: fadeIn .18s ease; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -151,7 +149,6 @@ input:focus { outline: none; border-color: var(--brand); background: #fff; }
 .sheet-foot .lbl { font-size: 13px; color: var(--mut); font-weight: 600; }
 .sheet-foot .val { font-size: 20px; font-weight: 800; color: var(--brand-dark); font-variant-numeric: tabular-nums; }
 
-/* история/категории (как раньше) */
 .date-group { margin-bottom: 8px; border-radius: 12px; overflow: hidden; background: #f9f9fb; }
 .date-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; background: #f0f2f5; }
 .date-header:active { background: #e5e5ea; }
@@ -307,19 +304,22 @@ details.recent-details[open] summary .chev { transform: rotate(90deg); }
       <label class="switch"><input type="checkbox" id="optCum"><span class="tr"></span>Накопительно</label>
     </div>
 
-    <button class="btn" onclick="buildChart(false)">🔍 Построить</button>
+    <button class="btn" id="buildBtn" onclick="buildChart(false)">🔍 Построить</button>
 
     <div class="chart-stage" style="margin-top:14px;">
       <div class="zoom-badge" id="zoomBadge">×1,0</div>
       <div class="zoom-bar">
-        <button class="zbtn" onclick="zoomBy(1.5)" aria-label="Приблизить">+</button>
-        <button class="zbtn" onclick="zoomBy(1/1.5)" aria-label="Отдалить">−</button>
+        <button class="zbtn" id="zPlus" onclick="zoomBy(1.5)" aria-label="Приблизить">+</button>
+        <button class="zbtn" id="zMinus" onclick="zoomBy(1/1.5)" aria-label="Отдалить">−</button>
         <button class="zbtn" id="zReset" onclick="resetView()" aria-label="Сбросить масштаб">⤢</button>
-        <button class="zbtn" onclick="panBy(-1)" aria-label="Сдвинуть влево">‹</button>
-        <button class="zbtn" onclick="panBy(1)" aria-label="Сдвинуть вправо">›</button>
+        <button class="zbtn" id="zLeft" onclick="panBy(-1)" aria-label="Сдвинуть влево">‹</button>
+        <button class="zbtn" id="zRight" onclick="panBy(1)" aria-label="Сдвинуть вправо">›</button>
         <button class="zbtn" onclick="downloadPng()" aria-label="Скачать PNG">🖼</button>
       </div>
-      <div class="chart-canvas-wrap"><canvas id="mainChart"></canvas></div>
+      <div class="chart-canvas-wrap">
+        <canvas id="mainChart"></canvas>
+        <div class="stage-msg" id="stageMsg"></div>
+      </div>
     </div>
     <div class="chart-hint" id="chartHint">Щипок / колесо — масштаб · перетаскивание — сдвиг · двойной тап — приблизить · <b>тап по точке — траты за день</b></div>
     <div class="window-summary" id="windowSummary" style="display:none;"></div>
@@ -366,7 +366,6 @@ details.recent-details[open] summary .chev { transform: rotate(90deg); }
   </div>
 </div>
 
-<!-- модалка поиска -->
 <div class="modal" id="searchModal" onclick="if(event.target===this)closeSearchModal()">
   <div class="modal-content">
     <div class="modal-header"><div class="modal-title" id="searchModalTitle">Траты</div>
@@ -375,7 +374,6 @@ details.recent-details[open] summary .chev { transform: rotate(90deg); }
   </div>
 </div>
 
-<!-- шторка трат дня -->
 <div class="sheet" id="daySheet" onclick="if(event.target===this)closeDaySheet()" role="dialog" aria-modal="true" aria-label="Траты за день">
   <div class="sheet-panel">
     <div class="sheet-grip"></div>
@@ -415,6 +413,7 @@ let chartCats = [], catColor = {};
 let buckets = [], seriesDefs = [], bucketTotalsRaw = [], labelsSig = '';
 let lastWindow = { a: 0, b: 0 };
 let sheetIdx = -1, sheetLastFocus = null;
+let buildToken = 0;
 
 const PALETTE = ['#3ddc84','#38bdf8','#fbbf24','#f472b6','#a78bfa','#fb923c','#22d3ee','#f87171'];
 const POINT_STYLES = ['circle','rectRounded','triangle','rectRot','crossRot','star','rect','circle'];
@@ -428,7 +427,6 @@ const GROUP_UNIT = { day: 'дн.', week: 'нед.', period: 'пер.' };
 const PERIOD_NAMES = { thisWeek: 'эта неделя', lastWeek: 'прошлая неделя', prevWeek: 'позапрошлая неделя', thisMonth: 'текущий месяц', lastMonth: 'прошлый месяц', custom: 'свой период' };
 const PAGE_TITLES = { home: '💸 Расходы', charts: '📈 Графики', history: '🕐 История', categories: '🏷 Категории' };
 
-/* плагины Chart.js — регистрация с защитой */
 let hasZoom = false, hasDL = false;
 if (typeof Chart !== 'undefined') {
   if (window.ChartDataLabels) { try { Chart.register(window.ChartDataLabels); hasDL = true; } catch (e) {} }
@@ -460,6 +458,8 @@ function capitalizeFirst(str) {
   if (!c) c = String(str).trim();
   return c.charAt(0).toUpperCase() + c.slice(1);
 }
+function showStageMsg(html) { const m = document.getElementById('stageMsg'); m.innerHTML = '<div>' + html + '</div>'; m.classList.add('show'); }
+function hideStageMsg() { document.getElementById('stageMsg').classList.remove('show'); }
 function jsonp(params) {
   return new Promise((resolve) => {
     const cb = 'jp_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
@@ -470,6 +470,16 @@ function jsonp(params) {
     document.body.appendChild(s);
     setTimeout(() => { if (window[cb]) { resolve({ ok: false, error: 'Таймаут' }); delete window[cb]; if (s.parentNode) s.parentNode.removeChild(s); } }, 60000);
   });
+}
+/* градиент от области графика — создаётся внутри рендера, без обращений к canvas до инициализации */
+function areaFill(col) {
+  return function (c) {
+    const ch = c.chart, area = ch.chartArea;
+    if (!area) return col + '30';
+    const g = ch.ctx.createLinearGradient(0, area.top, 0, area.bottom);
+    g.addColorStop(0, col + '59'); g.addColorStop(.65, col + '17'); g.addColorStop(1, col + '00');
+    return g;
+  };
 }
 
 /* ================= НАВИГАЦИЯ ================= */
@@ -485,17 +495,17 @@ function switchPage(page) {
 }
 async function initChartsPage() {
   if (typeof Chart === 'undefined') {
-    document.getElementById('chartHint').innerHTML = '⚠️ Библиотека графиков не загрузилась. Проверьте интернет и обновите страницу.';
+    showStageMsg('⚠️ Библиотека графиков не загрузилась.<br>Проверьте интернет и обновите страницу.');
     return;
   }
   if (!hasZoom) document.getElementById('chartHint').innerHTML = 'Кнопки <b>+ − ‹ ›</b> — масштаб и сдвиг · двойной тап — приблизить · <b>тап по точке — траты за день</b>';
   if (!chartsReady) {
     chartsReady = true;
-    await ensureChartData();
     await loadChartCategories();
     buildChart(false);
   } else if (!allExpenses) {
-    await ensureChartData(); await loadChartCategories(); buildChart(true);
+    await loadChartCategories();
+    buildChart(true);
   }
 }
 function invalidateChartData() {
@@ -504,7 +514,6 @@ function invalidateChartData() {
 }
 async function refreshChartData() {
   allExpenses = null;
-  await ensureChartData();
   await loadChartCategories();
   buildChart(false);
 }
@@ -524,7 +533,8 @@ async function ensureChartData() {
   document.getElementById('dataNotice').style.display = dataLimited ? 'block' : 'none';
   const tot = {};
   allExpenses.forEach(r => { const c = r.category || 'Другое'; tot[c] = (tot[c] || 0) + (r.amount || 0); });
-  chartCats = Object.keys(tot).sort((a, b) => tot[b] - tot[a]);
+  const fromRows = Object.keys(tot).sort((a, b) => tot[b] - tot[a]);
+  fromRows.forEach(c => { if (chartCats.indexOf(c) === -1) chartCats.push(c); });
 }
 async function loadChartCategories() {
   const data = await jsonp({ action: 'getCategoriesWithTotals' });
@@ -590,20 +600,20 @@ function setPeriod(v, btn) {
     if (!document.getElementById('dateTo').value) document.getElementById('dateTo').value = iso(t);
   } else {
     block.style.display = 'none';
-    if (chartsReady && allExpenses) buildChart(false);
+    if (chartsReady) buildChart(false);
   }
 }
 function setType(v, btn) {
   chartType = v;
   document.querySelectorAll('#typeChips .chip').forEach(c => c.classList.remove('active'));
   btn.classList.add('active');
-  if (mainChart) buildChart(true);
+  if (chartsReady) buildChart(true);
 }
 function setGroup(v, btn) {
   chartGroup = v;
   document.querySelectorAll('#groupChips .chip').forEach(c => c.classList.remove('active'));
   btn.classList.add('active');
-  if (mainChart) buildChart(false);
+  if (chartsReady) buildChart(false);
 }
 
 /* ================= КАТЕГОРИИ-ЧИПЫ ================= */
@@ -619,21 +629,21 @@ function toggleCat(cat, btn) {
     else { selectedCats.add(cat); btn.classList.add('active'); }
     if (selectedCats.size === 0) { selectedCats.add('__all'); if (allBtn) allBtn.classList.add('active'); }
   }
-  if (mainChart) buildChart(false);
+  if (chartsReady) buildChart(false);
 }
 function selectAllCats() {
   selectedCats = new Set(chartCats);
   document.querySelectorAll('#catChips .chip').forEach(c => {
     c.classList.toggle('active', c.getAttribute('data-c') !== '__all');
   });
-  if (mainChart) buildChart(false);
+  if (chartsReady) buildChart(false);
 }
 function deselectAllCats() {
   selectedCats = new Set(['__all']);
   document.querySelectorAll('#catChips .chip').forEach(c => {
     c.classList.toggle('active', c.getAttribute('data-c') === '__all');
   });
-  if (mainChart) buildChart(false);
+  if (chartsReady) buildChart(false);
 }
 
 /* ================= АГРЕГАЦИЯ ================= */
@@ -653,7 +663,7 @@ function weekLabel(mon) {
 }
 function makeBuckets(range) {
   const all = selectedCats.has('__all');
-  const rows = allExpenses.filter(r => {
+  const rows = (allExpenses || []).filter(r => {
     if (!r.dateOnly) return false;
     const d = parseISO(r.dateOnly);
     if (d < range.from || d > range.to) return false;
@@ -695,217 +705,228 @@ function makeBuckets(range) {
 }
 
 /* ================= ПОСТРОЕНИЕ ГРАФИКА ================= */
-function buildChart(preserve) {
-  if (typeof Chart === 'undefined') return;
-  const range = getPeriodDates(); if (!range) return;
-  let saved = null;
-  if (preserve && mainChart) {
+async function buildChart(preserve) {
+  const btn = document.getElementById('buildBtn');
+  const token = ++buildToken;
+  if (typeof Chart === 'undefined') {
+    showStageMsg('⚠️ Библиотека графиков не загрузилась.<br>Проверьте интернет и обновите страницу.');
+    return;
+  }
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Строю…';
+  try {
+    await ensureChartData();
+    if (token !== buildToken) return;
+    if (!allExpenses || !allExpenses.length) {
+      if (mainChart) { mainChart.destroy(); mainChart = null; }
+      document.getElementById('windowSummary').style.display = 'none';
+      document.getElementById('chartLegend').innerHTML = '';
+      showStageMsg('🌿 Пока нет записей.<br>Добавьте трату на «Главной» — график появится здесь.');
+      updateZoomButtons();
+      return;
+    }
+    const range = getPeriodDates(); if (!range) return;
+    const canvas = document.getElementById('mainChart');
+    let saved = null;
     const sig = chartGroup + '|' + chartPeriod + '|' + iso(range.from) + '|' + iso(range.to) + '|' + Array.from(selectedCats).sort().join(',');
-    if (sig === labelsSig) {
+    if (preserve && mainChart && sig === labelsSig) {
       const x = mainChart.scales.x;
       if (x && (x.min > 0 || x.max < mainChart.data.labels.length - 1)) saved = { min: x.min, max: x.max };
     }
-  }
-  buckets = makeBuckets(range);
-  labelsSig = chartGroup + '|' + chartPeriod + '|' + iso(range.from) + '|' + iso(range.to) + '|' + Array.from(selectedCats).sort().join(',');
-  bucketTotalsRaw = buckets.map(b => b.sum);
-  const labels = buckets.map(b => b.label);
-  const all = selectedCats.has('__all');
-  const orderedCats = all ? [] : chartCats.filter(c => selectedCats.has(c));
-  seriesDefs = [];
-  if (all) {
-    seriesDefs.push({ name: 'Все траты', color: PALETTE[0], raw: buckets.map(b => b.sum) });
-  } else {
-    orderedCats.forEach(c => seriesDefs.push({ name: c, color: catColor[c] || PALETTE[seriesDefs.length % PALETTE.length], raw: buckets.map(b => b.byCat[c] || 0) }));
-  }
-  const single = seriesDefs.length === 1;
-  const totalMean = bucketTotalsRaw.length ? bucketTotalsRaw.reduce((a, b) => a + b, 0) / bucketTotalsRaw.length : 0;
-  const datasets = seriesDefs.map((s, i) => {
-    let data = s.raw.slice();
-    if (opts.cum) { let acc = 0; data = data.map(v => (acc += v)); }
-    const col = s.color;
-    return {
-      label: s.name, data,
-      borderColor: col,
-      backgroundColor: chartType === 'line'
-        ? (single ? makeFill(col) : 'transparent')
-        : col + 'cc',
-      borderWidth: chartType === 'line' ? 2.5 : 1,
-      borderDash: chartType === 'line' ? DASHES[i % DASHES.length] : [],
-      pointStyle: POINT_STYLES[i % POINT_STYLES.length],
-      pointRadius: chartType === 'line' ? (ctx => (ctx.raw === 0 ? 2.5 : 4.5)) : 0,
-      pointHoverRadius: 7,
-      pointBackgroundColor: col,
-      pointBorderColor: '#0b1f16',
-      pointBorderWidth: 1.5,
-      tension: .28,
-      fill: chartType === 'line' && single,
-      borderRadius: chartType === 'bar' ? 5 : 0,
-      maxBarThickness: 34,
-      datalabels: {
-        display: (hasDL && single && opts.labels) ? 'auto' : false,
-        anchor: 'end', align: chartType === 'bar' ? 'top' : 'top', offset: 3, clamp: true,
-        color: '#d9ffe9',
-        font: { size: 10, weight: 700 },
-        formatter: v => fmtShort(v),
-        textStrokeColor: 'rgba(8,27,18,.85)', textStrokeWidth: 3
+    buckets = makeBuckets(range);
+    labelsSig = sig;
+    bucketTotalsRaw = buckets.map(b => b.sum);
+    const labels = buckets.map(b => b.label);
+    const all = selectedCats.has('__all');
+    const orderedCats = all ? [] : chartCats.filter(c => selectedCats.has(c));
+    seriesDefs = [];
+    if (all) {
+      seriesDefs.push({ name: 'Все траты', color: PALETTE[0], raw: buckets.map(b => b.sum) });
+    } else {
+      orderedCats.forEach(c => seriesDefs.push({ name: c, color: catColor[c] || PALETTE[seriesDefs.length % PALETTE.length], raw: buckets.map(b => b.byCat[c] || 0) }));
+    }
+    const single = seriesDefs.length === 1;
+    const totalMean = bucketTotalsRaw.length ? bucketTotalsRaw.reduce((a, b) => a + b, 0) / bucketTotalsRaw.length : 0;
+
+    const datasets = seriesDefs.map((s, i) => {
+      let data = s.raw.slice();
+      if (opts.cum) { let acc = 0; data = data.map(v => (acc += v)); }
+      const col = s.color;
+      return {
+        label: s.name, data,
+        borderColor: col,
+        backgroundColor: chartType === 'line' ? (single ? areaFill(col) : 'transparent') : col + 'd9',
+        borderWidth: chartType === 'line' ? 2.5 : 1,
+        borderDash: chartType === 'line' ? DASHES[i % DASHES.length] : [],
+        pointStyle: POINT_STYLES[i % POINT_STYLES.length],
+        pointRadius: chartType === 'line' ? (c => (c.raw === 0 ? 2.5 : 4.5)) : 0,
+        pointHoverRadius: 7,
+        pointBackgroundColor: col,
+        pointBorderColor: '#0b1f16',
+        pointBorderWidth: 1.5,
+        tension: .28,
+        fill: chartType === 'line' && single,
+        borderRadius: chartType === 'bar' ? 5 : 0,
+        maxBarThickness: 34,
+        datalabels: {
+          display: (hasDL && single && opts.labels) ? 'auto' : false,
+          anchor: 'end', align: 'top', offset: 3, clamp: true,
+          color: '#d9ffe9',
+          font: { size: 10, weight: 700 },
+          formatter: v => fmtShort(v),
+          textStrokeColor: 'rgba(8,27,18,.85)', textStrokeWidth: 3
+        }
+      };
+    });
+    if (opts.avg && buckets.length) {
+      let avgData = buckets.map(() => totalMean);
+      if (opts.cum) avgData = buckets.map((b, i) => totalMean * (i + 1));
+      datasets.push({
+        label: 'Среднее', isAvg: true, type: 'line', data: avgData,
+        borderColor: '#fbbf24', borderDash: [7, 5], borderWidth: 2,
+        pointRadius: 0, pointHoverRadius: 0, fill: false, tension: 0,
+        datalabels: { display: false }
+      });
+    }
+    const stacked = chartType === 'bar' && !single;
+    const todayKey = iso(new Date());
+    const todayIdx = chartGroup === 'day' ? buckets.findIndex(b => b.key === todayKey) : -1;
+
+    if (mainChart) { mainChart.destroy(); mainChart = null; }
+
+    const weekendPlugin = {
+      id: 'weekendBands',
+      beforeDatasetsDraw(chart) {
+        if (!opts.weekend || chartGroup !== 'day') return;
+        const cc = chart.ctx, ca = chart.chartArea, x = chart.scales.x;
+        const step = buckets.length > 1 ? Math.abs(x.getPixelForValue(1) - x.getPixelForValue(0)) : ca.width;
+        cc.save(); cc.fillStyle = 'rgba(56,189,248,.07)';
+        const a = Math.max(0, Math.floor(x.min)), b = Math.min(buckets.length - 1, Math.ceil(x.max));
+        for (let i = a; i <= b; i++) {
+          if (!buckets[i].weekend) continue;
+          const cx = x.getPixelForValue(i);
+          cc.fillRect(cx - step * .48, ca.top, step * .96, ca.bottom - ca.top);
+        }
+        cc.restore();
       }
     };
-  });
-  if (opts.avg && buckets.length) {
-    let avgData = buckets.map(() => totalMean);
-    if (opts.cum) { avgData = buckets.map((b, i) => totalMean * (i + 1)); }
-    datasets.push({
-      label: 'Среднее', isAvg: true, type: 'line', data: avgData,
-      borderColor: '#fbbf24', borderDash: [7, 5], borderWidth: 2,
-      pointRadius: 0, pointHoverRadius: 0, fill: false, tension: 0,
-      datalabels: { display: false }
-    });
-  }
-  const stacked = chartType === 'bar' && !single;
-  const todayKey = iso(new Date());
-  const todayIdx = chartGroup === 'day' ? buckets.findIndex(b => b.key === todayKey) : -1;
-
-  if (mainChart) { mainChart.destroy(); mainChart = null; }
-  const ctx = document.getElementById('mainChart');
-
-  const weekendPlugin = {
-    id: 'weekendBands',
-    beforeDatasetsDraw(chart) {
-      if (!opts.weekend || chartGroup !== 'day') return;
-      const { ctx, chartArea: ca, scales: { x } } = chart;
-      const step = buckets.length > 1 ? Math.abs(x.getPixelForValue(1) - x.getPixelForValue(0)) : ca.width;
-      ctx.save(); ctx.fillStyle = 'rgba(56,189,248,.07)';
-      const a = Math.max(0, Math.floor(x.min)), b = Math.min(buckets.length - 1, Math.ceil(x.max));
-      for (let i = a; i <= b; i++) {
-        if (!buckets[i].weekend) continue;
-        const cx = x.getPixelForValue(i);
-        ctx.fillRect(cx - step * .48, ca.top, step * .96, ca.bottom - ca.top);
+    const todayPlugin = {
+      id: 'todayLine',
+      afterDatasetsDraw(chart) {
+        if (todayIdx < 0) return;
+        const cc = chart.ctx, ca = chart.chartArea, x = chart.scales.x;
+        if (todayIdx < x.min - .5 || todayIdx > x.max + .5) return;
+        const px = x.getPixelForValue(todayIdx);
+        cc.save();
+        cc.strokeStyle = 'rgba(61,220,132,.55)'; cc.setLineDash([4, 4]); cc.lineWidth = 1.2;
+        cc.beginPath(); cc.moveTo(px, ca.top); cc.lineTo(px, ca.bottom); cc.stroke();
+        cc.setLineDash([]);
+        cc.fillStyle = 'rgba(61,220,132,.9)'; cc.font = '700 9px -apple-system,Segoe UI,Roboto,sans-serif';
+        cc.textAlign = 'center'; cc.fillText('СЕГОДНЯ', px, ca.top - 4);
+        cc.restore();
       }
-      ctx.restore();
-    }
-  };
-  const todayPlugin = {
-    id: 'todayLine',
-    afterDatasetsDraw(chart) {
-      if (todayIdx < 0) return;
-      const { ctx, chartArea: ca, scales: { x } } = chart;
-      if (todayIdx < x.min - .5 || todayIdx > x.max + .5) return;
-      const px = x.getPixelForValue(todayIdx);
-      ctx.save();
-      ctx.strokeStyle = 'rgba(61,220,132,.55)'; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.moveTo(px, ca.top); ctx.lineTo(px, ca.bottom); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = 'rgba(61,220,132,.9)'; ctx.font = '700 9px -apple-system,Segoe UI,Roboto,sans-serif';
-      ctx.textAlign = 'center'; ctx.fillText('СЕГОДНЯ', px, ca.top - 4);
-      ctx.restore();
-    }
-  };
-  const crosshairPlugin = {
-    id: 'crosshair',
-    afterDatasetsDraw(chart) {
-      const act = chart.tooltip && chart.tooltip.getActiveElements ? chart.tooltip.getActiveElements() : [];
-      if (!act.length) return;
-      const { ctx, chartArea: ca } = chart; const px = act[0].element.x;
-      ctx.save();
-      ctx.strokeStyle = 'rgba(217,255,233,.35)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
-      ctx.beginPath(); ctx.moveTo(px, ca.top); ctx.lineTo(px, ca.bottom); ctx.stroke();
-      ctx.restore();
-    }
-  };
-  function makeFill(col) {
-    const g = ctx.getContext('2d').createLinearGradient(0, 0, 0, 360);
-    g.addColorStop(0, col + '55'); g.addColorStop(.7, col + '14'); g.addColorStop(1, col + '00');
-    return g;
-  }
+    };
+    const crosshairPlugin = {
+      id: 'crosshair',
+      afterDatasetsDraw(chart) {
+        const act = chart.tooltip && chart.tooltip.getActiveElements ? chart.tooltip.getActiveElements() : [];
+        if (!act.length) return;
+        const cc = chart.ctx, ca = chart.chartArea, px = act[0].element.x;
+        cc.save();
+        cc.strokeStyle = 'rgba(217,255,233,.35)'; cc.lineWidth = 1; cc.setLineDash([3, 3]);
+        cc.beginPath(); cc.moveTo(px, ca.top); cc.lineTo(px, ca.bottom); cc.stroke();
+        cc.restore();
+      }
+    };
 
-  const zoomCfg = hasZoom ? {
-    pan: { enabled: true, mode: 'x', onPanComplete: () => syncWindow() },
-    zoom: {
-      wheel: { enabled: true, speed: .09 },
-      pinch: { enabled: true },
-      mode: 'x',
-      onZoomComplete: () => syncWindow()
-    },
-    limits: { x: { min: 'original', max: 'original', minRange: 2 } }
-  } : undefined;
+    const zoomCfg = (hasZoom && buckets.length >= 3) ? {
+      pan: { enabled: true, mode: 'x', onPanComplete: () => syncWindow() },
+      zoom: { wheel: { enabled: true, speed: .09 }, pinch: { enabled: true }, mode: 'x', onZoomComplete: () => syncWindow() },
+      limits: { x: { min: 'original', max: 'original', minRange: 2 } }
+    } : undefined;
 
-  mainChart = new Chart(ctx, {
-    type: chartType,
-    data: { labels, datasets },
-    plugins: [weekendPlugin, todayPlugin, crosshairPlugin],
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      devicePixelRatio: Math.min(2, window.devicePixelRatio || 1),
-      animation: { duration: 280 },
-      layout: { padding: { top: 26, right: 52, left: 6, bottom: 4 } },
-      interaction: { mode: 'index', intersect: false },
-      onClick(evt) {
-        const els = mainChart.getElementsAtEventForMode(evt, 'index', { intersect: false }, true);
-        if (els.length) openDaySheet(els[0].index);
-      },
-      onHover(evt, els) { evt.native.target.style.cursor = els.length ? 'pointer' : 'grab'; },
-      scales: {
-        x: {
-          stacked,
-          min: saved ? saved.min : undefined,
-          max: saved ? saved.max : undefined,
-          grid: { color: 'rgba(158,216,187,.08)' },
-          ticks: { color: '#9ed8bb', font: { size: 10.5, weight: 600 }, maxRotation: 0, autoSkip: true, autoSkipPadding: 12 }
+    mainChart = new Chart(canvas, {
+      type: chartType,
+      data: { labels, datasets },
+      plugins: [weekendPlugin, todayPlugin, crosshairPlugin],
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        devicePixelRatio: Math.min(2, window.devicePixelRatio || 1),
+        animation: { duration: 280 },
+        layout: { padding: { top: 26, right: 52, left: 6, bottom: 4 } },
+        interaction: { mode: 'index', intersect: false },
+        onClick(evt) {
+          if (!mainChart) return;
+          const els = mainChart.getElementsAtEventForMode(evt, 'index', { intersect: false }, true);
+          if (els.length) openDaySheet(els[0].index);
         },
-        y: {
-          stacked, beginAtZero: true, grace: '10%',
-          grid: { color: 'rgba(158,216,187,.1)' },
-          ticks: { color: '#9ed8bb', font: { size: 10.5 }, callback: v => fmtShort(v) || '0' }
-        }
-      },
-      plugins: {
-        legend: { display: false },
-        datalabels: hasDL ? {} : false,
-        zoom: zoomCfg,
-        tooltip: {
-          backgroundColor: 'rgba(9,30,21,.95)',
-          borderColor: 'rgba(61,220,132,.45)', borderWidth: 1,
-          titleColor: '#eafff3', bodyColor: '#cfeede', footerColor: '#9ed8bb',
-          padding: 11, cornerRadius: 10, boxWidth: 8, boxHeight: 8, boxPadding: 4,
-          titleFont: { size: 13, weight: 800 }, bodyFont: { size: 12 }, footerFont: { size: 11, weight: 600 },
-          filter: item => !item.dataset.isAvg,
-          callbacks: {
-            title(items) {
-              if (!items.length) return '';
-              const b = buckets[items[0].dataIndex];
-              return b.label + (chartGroup === 'day' ? ' · ' + b.sub : '');
-            },
-            label(item) {
-              const b = buckets[item.dataIndex];
-              const raw = item.dataset.isAvg ? item.parsed.y : (seriesDefs[item.datasetIndex] ? seriesDefs[item.datasetIndex].raw[item.dataIndex] : item.parsed.y);
-              let s = ' ' + item.dataset.label + ': ' + fmtMoney(raw) + ' ₽';
-              if (opts.cum && !item.dataset.isAvg) s += '  (Σ ' + fmtMoney(item.parsed.y) + ')';
-              return s;
-            },
-            afterBody(items) {
-              if (!items.length) return [];
-              const b = buckets[items[0].dataIndex];
-              if (!b.items.length) return ['Нет трат'];
-              const sorted = b.items.slice().sort((x, y) => rowTs(y) - rowTs(x));
-              const lines = sorted.slice(0, 3).map(r => '• ' + capitalizeFirst(r.text || r.category) + ' — ' + fmtMoney(r.amount) + ' ₽');
-              if (sorted.length > 3) lines.push('… ещё ' + (sorted.length - 3));
-              lines.push('👆 тап — все траты');
-              return lines;
-            },
-            footer(items) {
-              if (!items.length || seriesDefs.length < 2) return '';
-              const b = buckets[items[0].dataIndex];
-              return 'Итого: ' + fmtMoney(b.sum) + ' ₽ · ' + b.count + ' шт.';
+        onHover(evt, els) { if (evt.native && evt.native.target) evt.native.target.style.cursor = els.length ? 'pointer' : 'grab'; },
+        scales: {
+          x: {
+            stacked,
+            min: saved ? saved.min : undefined,
+            max: saved ? saved.max : undefined,
+            grid: { color: 'rgba(158,216,187,.08)' },
+            ticks: { color: '#9ed8bb', font: { size: 10.5, weight: 600 }, maxRotation: 0, autoSkip: true, autoSkipPadding: 12 }
+          },
+          y: {
+            stacked, beginAtZero: true, grace: '10%',
+            grid: { color: 'rgba(158,216,187,.1)' },
+            ticks: { color: '#9ed8bb', font: { size: 10.5 }, callback: v => fmtShort(v) || '0' }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          datalabels: hasDL ? {} : false,
+          zoom: zoomCfg,
+          tooltip: {
+            backgroundColor: 'rgba(9,30,21,.95)',
+            borderColor: 'rgba(61,220,132,.45)', borderWidth: 1,
+            titleColor: '#eafff3', bodyColor: '#cfeede', footerColor: '#9ed8bb',
+            padding: 11, cornerRadius: 10, boxWidth: 8, boxHeight: 8, boxPadding: 4,
+            titleFont: { size: 13, weight: 800 }, bodyFont: { size: 12 }, footerFont: { size: 11, weight: 600 },
+            filter: item => !item.dataset.isAvg,
+            callbacks: {
+              title(items) {
+                if (!items.length) return '';
+                const b = buckets[items[0].dataIndex];
+                return b.label + (chartGroup === 'day' ? ' · ' + b.sub : '');
+              },
+              label(item) {
+                const raw = item.dataset.isAvg ? item.parsed.y : (seriesDefs[item.datasetIndex] ? seriesDefs[item.datasetIndex].raw[item.dataIndex] : item.parsed.y);
+                let s = ' ' + item.dataset.label + ': ' + fmtMoney(raw) + ' ₽';
+                if (opts.cum && !item.dataset.isAvg) s += '  (Σ ' + fmtMoney(item.parsed.y) + ')';
+                return s;
+              },
+              afterBody(items) {
+                if (!items.length) return [];
+                const b = buckets[items[0].dataIndex];
+                if (!b.items.length) return ['Нет трат'];
+                const sorted = b.items.slice().sort((x, y) => rowTs(y) - rowTs(x));
+                const lines = sorted.slice(0, 3).map(r => '• ' + capitalizeFirst(r.text || r.category) + ' — ' + fmtMoney(r.amount) + ' ₽');
+                if (sorted.length > 3) lines.push('… ещё ' + (sorted.length - 3));
+                lines.push('👆 тап — все траты');
+                return lines;
+              },
+              footer(items) {
+                if (!items.length || seriesDefs.length < 2) return '';
+                const b = buckets[items[0].dataIndex];
+                return 'Итого: ' + fmtMoney(b.sum) + ' ₽ · ' + b.count + ' шт.';
+              }
             }
           }
         }
       }
-    }
-  });
-  ctx.ondblclick = () => zoomBy(1.6);
-  renderLegend();
-  syncWindow();
+    });
+    canvas.ondblclick = () => zoomBy(1.6);
+    hideStageMsg();
+    renderLegend();
+    syncWindow();
+  } catch (err) {
+    console.error('buildChart:', err);
+    showStageMsg('⚠️ Не удалось построить график.<br><button class="chip small" onclick="buildChart(false)">🔄 Повторить</button>');
+  } finally {
+    if (token === buildToken) { btn.disabled = false; btn.innerHTML = '🔍 Построить'; }
+  }
 }
 
 /* ================= ЛЕГЕНДА ================= */
@@ -918,14 +939,12 @@ function renderLegend() {
     const chip = document.createElement('button');
     chip.className = 'lg-chip' + (visible ? '' : ' off');
     chip.setAttribute('aria-pressed', visible);
-    let totalTxt = '';
     if (ds.isAvg) {
-      totalTxt = fmtMoney(ds.data[0] || 0) + ' ₽/шаг';
-      chip.innerHTML = '<span class="dash"></span>' + escapeHtml(ds.label) + ' <span class="sum">' + totalTxt + '</span>';
+      chip.innerHTML = '<span class="dash"></span>' + escapeHtml(ds.label) + ' <span class="sum">' + fmtMoney(ds.data[0] || 0) + ' ₽/шаг</span>';
     } else {
       const raw = seriesDefs[i] ? seriesDefs[i].raw : ds.data;
-      totalTxt = fmtMoney(raw.reduce((a, b) => a + b, 0)) + ' ₽';
-      chip.innerHTML = '<span class="dot" style="background:' + ds.borderColor + '"></span>' + escapeHtml(ds.label) + ' <span class="sum">' + totalTxt + '</span>';
+      chip.innerHTML = '<span class="dot" style="background:' + ds.borderColor + '"></span>' + escapeHtml(ds.label) +
+        ' <span class="sum">' + fmtMoney(raw.reduce((a, b) => a + b, 0)) + ' ₽</span>';
     }
     chip.onclick = () => {
       mainChart.setDatasetVisibility(i, !mainChart.isDatasetVisible(i));
@@ -943,8 +962,13 @@ function visibleRange() {
   const a = Math.max(0, Math.round(x.min)); const b = Math.min(n - 1, Math.round(x.max));
   return { a, b, n };
 }
+function updateZoomButtons() {
+  const n = mainChart ? mainChart.data.labels.length : 0;
+  const off = n < 3;
+  ['zPlus', 'zMinus', 'zLeft', 'zRight'].forEach(id => { document.getElementById(id).disabled = off; });
+}
 function syncWindow() {
-  if (!mainChart || !buckets.length) return;
+  if (!mainChart || !buckets.length) { updateZoomButtons(); return; }
   const { a, b, n } = visibleRange();
   lastWindow = { a, b };
   const count = b - a + 1;
@@ -962,9 +986,11 @@ function syncWindow() {
   ws.innerHTML = '<b>' + fmtMoney(sum) + ' ₽</b> в видимом окне · ' + count + ' ' + GROUP_UNIT[chartGroup] +
     ' · ≈' + fmtMoney(avg) + ' ₽/' + GROUP_UNIT[chartGroup] +
     '<br><span style="color:#8e8e93;font-size:12px;">' + escapeHtml(buckets[a].label) + ' → ' + escapeHtml(buckets[b].label) + '</span>';
+  updateZoomButtons();
 }
 function setWindow(a, b) {
   const n = mainChart.data.labels.length;
+  if (n < 3) return;
   a = Math.max(0, Math.min(a, n - 3)); b = Math.min(n - 1, Math.max(b, a + 2));
   mainChart.options.scales.x.min = a;
   mainChart.options.scales.x.max = b;
@@ -974,23 +1000,23 @@ function setWindow(a, b) {
 function zoomBy(f) {
   if (!mainChart) return;
   const { a, b, n } = visibleRange();
+  if (n < 3) return;
   const span = b - a + 1;
-  let newSpan = Math.round(span / f);
-  newSpan = Math.max(3, Math.min(n, newSpan));
+  let newSpan = Math.max(3, Math.min(n, Math.round(span / f)));
   if (newSpan === span && f > 1) newSpan = Math.max(3, span - 1);
+  if (newSpan === span) return;
   const center = (a + b) / 2;
-  let na = Math.round(center - newSpan / 2);
-  na = Math.max(0, Math.min(na, n - newSpan));
+  let na = Math.max(0, Math.min(Math.round(center - newSpan / 2), n - newSpan));
   if (na === 0 && newSpan === n) { resetView(); return; }
   setWindow(na, na + newSpan - 1);
 }
 function panBy(dir) {
   if (!mainChart) return;
   const { a, b, n } = visibleRange();
+  if (n < 3) return;
   const span = b - a + 1;
   const shift = Math.max(1, Math.round(span * .3)) * dir;
-  let na = a + shift;
-  na = Math.max(0, Math.min(na, n - span));
+  let na = Math.max(0, Math.min(a + shift, n - span));
   setWindow(na, na + span - 1);
 }
 function resetView() {
@@ -1412,10 +1438,11 @@ async function deleteCategory(row) {
 /* ================= СТАРТ ================= */
 document.getElementById('text').addEventListener('keypress', e => { if (e.key === 'Enter') submitExpense(); });
 document.getElementById('catInput').addEventListener('keypress', e => { if (e.key === 'Enter') submitCategory(); });
-document.getElementById('dateFrom').addEventListener('change', () => { if (chartPeriod === 'custom' && mainChart) buildChart(false); });
-document.getElementById('dateTo').addEventListener('change', () => { if (chartPeriod === 'custom' && mainChart) buildChart(false); });
+document.getElementById('dateFrom').addEventListener('change', () => { if (chartPeriod === 'custom' && chartsReady) buildChart(false); });
+document.getElementById('dateTo').addEventListener('change', () => { if (chartPeriod === 'custom' && chartsReady) buildChart(false); });
 loadStats(); loadRecent(); loadCategories(); loadMonthly();
 renderPdfPreview();
+updateZoomButtons();
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(r => console.log('SW OK:', r.scope)).catch(err => console.log('SW error:', err));
